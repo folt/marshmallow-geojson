@@ -9,6 +9,9 @@ from .schemas import (
     PointSchema,
     PolygonSchema,
 )
+from .geojson import (
+    GeoJSON,
+)
 
 __author__ = 'Aliaksandr Vaskevich'
 __maintainer__ = __author__
@@ -27,6 +30,7 @@ __all__ = (
     # schemas
     'FeatureSchema',
     'FeatureCollectionSchema',
+
     'GeometryCollectionSchema',
     'LineStringSchema',
     'MultiLineStringSchema',
@@ -34,4 +38,6 @@ __all__ = (
     'MultiPolygonSchema',
     'PointSchema',
     'PolygonSchema',
+
+    'GeoJSON',
 )

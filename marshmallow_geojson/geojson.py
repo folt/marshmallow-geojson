@@ -1,0 +1,3 @@
+
+class GeoJSON:
+    pass

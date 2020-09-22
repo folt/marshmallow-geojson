@@ -12,6 +12,7 @@ from .schemas import (
 from .geojson import (
     GeoJSON,
 )
+from .schemas._base import BaseSchema
 
 __author__ = 'Aliaksandr Vaskevich'
 __maintainer__ = __author__
@@ -26,6 +27,10 @@ __all__ = (
     '__license__',
     '__maintainer__',
     '__version__',
+
+    # enum type
+    'GeometryType',
+
 
     # schemas
     'FeatureSchema',

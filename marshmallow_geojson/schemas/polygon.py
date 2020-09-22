@@ -1,5 +1,5 @@
 import marshmallow as ma
-from ._base import BaseSchema
+from .base import BaseSchema
 
 
 class PolygonSchema(BaseSchema):

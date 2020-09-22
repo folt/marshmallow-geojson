@@ -7,8 +7,11 @@ from .multi_point import MultiPointSchema
 from .multi_polygon import MultiPolygonSchema
 from .point import PointSchema
 from .polygon import PolygonSchema
+from .base import GeometryType
 
 __all__ = (
+    'GeometryType',
+
     'FeatureSchema',
     'FeatureCollectionSchema',
     'GeometryCollectionSchema',
@@ -18,4 +21,5 @@ __all__ = (
     'MultiPolygonSchema',
     'PointSchema',
     'PolygonSchema',
+
 )

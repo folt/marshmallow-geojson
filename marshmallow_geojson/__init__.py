@@ -1,18 +1,40 @@
-from .schemas import (
-    FeatureSchema,
-    FeatureCollectionSchema,
-    GeometryCollectionSchema,
-    LineStringSchema,
-    MultiLineStringSchema,
-    MultiPointSchema,
-    MultiPolygonSchema,
-    PointSchema,
-    PolygonSchema,
+from .feature import (
+    FeatureSchema
+)
+from .feature_collection import (
+    FeatureCollectionSchema
+)
+from .geometry_collection import (
+    GeometryCollectionSchema
+)
+from .line_string import (
+    LineStringSchema
+)
+from .multi_line_string import (
+    MultiLineStringSchema
+)
+from .multi_point import (
+    MultiPointSchema
+)
+from .multi_polygon import (
+    MultiPolygonSchema
+)
+from .point import (
+    PointSchema
+)
+from .polygon import (
+    PolygonSchema
 )
 from .geojson import (
     GeoJSON,
 )
-from .schemas._base import BaseSchema
+from .object_type import (
+    GeometryType,
+    GeoJSONType,
+)
+from .element import (
+    CoordinateField,
+)
 
 __author__ = 'Aliaksandr Vaskevich'
 __maintainer__ = __author__
@@ -28,14 +50,13 @@ __all__ = (
     '__maintainer__',
     '__version__',
 
-    # enum type
+    # object type
     'GeometryType',
-
+    'GeoJSONType',
 
     # schemas
     'FeatureSchema',
     'FeatureCollectionSchema',
-
     'GeometryCollectionSchema',
     'LineStringSchema',
     'MultiLineStringSchema',
@@ -43,6 +64,10 @@ __all__ = (
     'MultiPolygonSchema',
     'PointSchema',
     'PolygonSchema',
+
+    # fields
+    'CoordinateField',
+
 
     'GeoJSON',
 )

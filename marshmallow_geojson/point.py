@@ -1,11 +1,11 @@
 import marshmallow as ma
 from .base import BaseSchema
 from .element import (
-    CoordinatesField,
+    CoordinateField,
 )
 
 
 class PointSchema(BaseSchema):
-    coordinates = CoordinatesField(
+    coordinates = CoordinateField(
         required=True,
     )

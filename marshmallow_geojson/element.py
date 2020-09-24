@@ -4,15 +4,15 @@ from marshmallow import (
 )
 
 
-class CoordinatesField(fields.Field):
+class CoordinateField(fields.Field):
     default_error_messages = {
-        'invalid': 'Not a valid coordinates.'
+        'invalid': 'Not a valid coordinate.'
     }
-    coordinates_type = float
+    coordinate_type = float
 
     def _format_coordinate(self, value):
-        lon = self.coordinates_type(value[0])
-        lat = self.coordinates_type(value[1])
+        lon = self.coordinate_type(value[0])
+        lat = self.coordinate_type(value[1])
         return [lon, lat]
 
     def _validate_coordinate(self, value):
@@ -23,13 +23,19 @@ class CoordinatesField(fields.Field):
     def _validated(self, value):
         if value is None:
             return []
-        if isinstance(value[0], list):
-            return [self._validate_coordinate(item) for item in value]
-        else:
-            return self._validate_coordinate(value)
+
+        return self._validate_coordinate(value)
 
     def _serialize(self, value, attr, obj, **kwargs):
         return value
 
     def _deserialize(self, value, attr, data, **kwargs):
         return self._validated(value)
+
+
+class CoordinatesField(CoordinateField):
+
+    def _validated(self, value):
+        if value is None:
+            return []
+        return [self._validate_coordinate(item) for item in value]

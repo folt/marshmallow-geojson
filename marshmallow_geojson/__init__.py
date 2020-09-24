@@ -33,6 +33,7 @@ from .object_type import (
     GeoJSONType,
 )
 from .element import (
+    CoordinateField,
     CoordinatesField,
 )
 
@@ -66,8 +67,8 @@ __all__ = (
     'PolygonSchema',
 
     # fields
+    'CoordinateField',
     'CoordinatesField',
-
 
     'GeoJSON',
 )

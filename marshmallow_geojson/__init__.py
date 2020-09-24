@@ -33,7 +33,7 @@ from .object_type import (
     GeoJSONType,
 )
 from .element import (
-    CoordinateField,
+    CoordinatesField,
 )
 
 __author__ = 'Aliaksandr Vaskevich'
@@ -66,7 +66,7 @@ __all__ = (
     'PolygonSchema',
 
     # fields
-    'CoordinateField',
+    'CoordinatesField',
 
 
     'GeoJSON',

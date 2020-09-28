@@ -12,7 +12,11 @@ before_install:
 
 install:
   - poetry install
+  - poetry add codecov
+  - poetry add tox
 
 script:
-  - pytest
+  - tox -v
 
+after_success:
+  - codecov

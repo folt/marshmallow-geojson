@@ -39,3 +39,11 @@ class CoordinatesField(CoordinateField):
         if value is None:
             return []
         return [self._validate_coordinate(item) for item in value]
+
+
+class GeometryField(fields.Field):
+    def _serialize(self, value, attr, obj, **kwargs):
+        return value
+
+    def _deserialize(self, value, attr, data, **kwargs):
+        return value

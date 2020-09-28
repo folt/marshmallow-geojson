@@ -1,6 +1,25 @@
 import marshmallow as ma
-from .base import BaseSchema
+from marshmallow.fields import (
+    Str,
+)
+from marshmallow.validate import (
+    OneOf,
+)
+from .element import (
+    GeometryField,
+)
+from .object_type import (
+    FEATURE,
+)
 
 
-class FeatureSchema(BaseSchema):
-    pass
+class FeatureSchema(ma.Schema):
+    type = Str(
+        required=True,
+        validate=OneOf(
+            [FEATURE],
+            error='Invalid feature type'),
+    )
+    geometry = GeometryField(
+        required=True,
+    )

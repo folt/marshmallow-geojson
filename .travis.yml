@@ -15,4 +15,4 @@ install:
 
 script:
   - pytest
-  - codecov
+

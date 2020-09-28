@@ -1,3 +1,11 @@
-[![Build Status](https://travis-ci.org/folt/marshmallow-geojson.svg?branch=master)](https://travis-ci.org/folt/marshmallow-geojson)
-[![codecov](https://codecov.io/gh/folt/marshmallow-geojson/branch/master/graph/badge.svg)](https://codecov.io/gh/folt/marshmallow-geojson)
-# marshmallow_geojson
+marshmallow_geojson
+==============
+
+
+.. image:: https://travis-ci.org/folt/marshmallow-geojson.svg
+   :target: https://travis-ci.org/github/folt/marshmallow-geojson
+   :alt: Travis
+
+.. image:: https://codecov.io/gh/folt/marshmallow-geojson/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/folt/marshmallow-geojson
+   :alt: Codecov

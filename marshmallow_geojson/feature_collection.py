@@ -5,9 +5,6 @@ from marshmallow.fields import (
 from marshmallow.validate import (
     OneOf,
 )
-from .element import (
-    GeometryField,
-)
 from .object_type import (
     FEATURE_COLLECTION,
 )
@@ -19,8 +16,4 @@ class FeatureCollectionSchema(ma.Schema):
         validate=OneOf(
             [FEATURE_COLLECTION],
             error='Invalid feature collection type'),
-    )
-    geometry = GeometryField(
-        required=True,
-        many=True,
     )

@@ -5,9 +5,6 @@ from marshmallow.fields import (
 from marshmallow.validate import (
     OneOf,
 )
-from .element import (
-    CoordinateField,
-)
 from .object_type import (
     MULTI_POINT,
 )
@@ -19,8 +16,4 @@ class MultiPointSchema(ma.Schema):
         validate=OneOf(
             [MULTI_POINT],
             error='Invalid multi point type'),
-    )
-
-    coordinates = CoordinateField(
-        required=True,
     )

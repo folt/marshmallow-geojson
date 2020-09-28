@@ -5,9 +5,7 @@ from marshmallow.fields import (
 from marshmallow.validate import (
     OneOf,
 )
-from .element import (
-    CoordinateField,
-)
+
 from .object_type import (
     LINE_STRING,
 )
@@ -19,8 +17,4 @@ class LineStringSchema(ma.Schema):
         validate=OneOf(
             [LINE_STRING],
             error='Invalid line string type'),
-    )
-
-    coordinates = CoordinateField(
-        required=True,
     )

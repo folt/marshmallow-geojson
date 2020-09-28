@@ -5,9 +5,6 @@ from marshmallow.fields import (
 from marshmallow.validate import (
     OneOf,
 )
-from .element import (
-    GeometryField,
-)
 from .object_type import (
     FEATURE,
 )
@@ -19,7 +16,4 @@ class FeatureSchema(ma.Schema):
         validate=OneOf(
             [FEATURE],
             error='Invalid feature type'),
-    )
-    geometry = GeometryField(
-        required=True,
     )

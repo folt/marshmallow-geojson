@@ -16,7 +16,8 @@ install:
   - poetry add tox
 
 script:
-  - tox -v
+  - pytest
+#  - tox -v
 
-after_success:
-  - codecov
+#after_success:
+#  - codecov

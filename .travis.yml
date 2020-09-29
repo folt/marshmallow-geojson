@@ -25,7 +25,6 @@ before_deploy:
 
 deploy:
   cleanup: true
-  skip_existing: true
   provider: script
   script: poetry publish
   on:

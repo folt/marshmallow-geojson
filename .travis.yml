@@ -12,10 +12,9 @@ before_install:
 
 install:
   - poetry install
-  - poetry add codecov
 
 script:
   - pytest
 
 after_success:
-  - codecov
+  - bash <(curl -s https://codecov.io/bash)

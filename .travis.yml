@@ -19,15 +19,13 @@ script:
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 
-
 before_deploy:
-- poetry config pypi-token.pypi $PYPI_TOKEN
-- poetry build
+  - poetry config pypi-token.pypi $PYPI_TOKEN
 
 deploy:
   cleanup: true
   provider: script
-  script: poetry publish
-
+  script: poetry publish --build
+  condition: $TRAVIS_PYTHON_VERSION == 3.8
   on:
     branch: master

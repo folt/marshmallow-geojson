@@ -1,30 +1,23 @@
 dist: xenial
-
 language: python
-
 python:
   - 3.7
   - 3.8
-
 before_install:
   - curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
   - source $HOME/.poetry/env
-
 install:
   - poetry install
-
 script:
   - pytest --cov=./
-
 after_success:
   - bash <(curl -s https://codecov.io/bash)
-
 deploy:
   provider: pypi
   cleanup: true
   skip_existing: true
   username: __token__
   password:
-    secure: ELxaWWbP0vMTsGJ3cq44uItZ8u13HPqozookytmu/thdHEHu6PVPuBhIHc8KNS54Vq2M+a/ak+tKAIgd1Bid/0/yF6R5wkzaTjyEM2sc7MTQrJ1v8YXIoGhY2AsVASNlYFswiTP1YntClj8/nilzPKlK+Vx8ap46WKqEHQTugGTjV8AKXkf8l3cF3QJJFYoJK89jjjG2RpTwoTFJ1Che6dqJE/K1wrgvnN6vcvTb6I1LqJ1ZzGqMWYQpic1drRjCF5l5dXO7XsYGNEU4my0M0FHzRHWjZ7F/CD/T8q4ZvJXuoYQflBp1dGyAezFmXlnYf9/xgh91yglmptxMSobOi7MTu6DgaAHPJeuAipC9pxeOFRpl1Kwi/vTLiXwVRJHMXY0bOatyC55liHPa7jK6KUegmsfur5uuA9HkQnG1cWvwQ5KLBg/r3agCXytX6NFIvSdzmgtA+AA3+8qGo1ud7ROXmohvpqJTmVUa69KRhcCfg3fYxRkSpYFuhM6lTt4FtMt1gWRZsdh9iM7vEg4r1HJbdrbetEMu0nM3JMphfoebrpwMV7wt6Gv/mEJ8UBrVN7RGFZzQuNDencoQLwm3JjCkZxKhvc4pRVToo5gHL6vi4wJg9HPxh1I28/woVMmQMLkLe+R4/dNScidfLS6oaagg292GZzN2Nm7G3ofT6eA=
+    secure: hJQ7Vy1T5eR2B6WG6rXgudHlHeAtAYQwMJ4ifkALC2RR28aWVSLbGWWK0YEpyAzV+knOzPwT0a3aQsK5X0q++Ks1bbDLwKiSdM5zH/borin9Qo/JsJ1SDzeB35YqeYAQzCUd270vFuCJsB1dIV8Wiv+pm7t8VXuLEz53rYsu/2Xowbd/kUhx1m9FyoC4nRL14sb4rzlAiOMFp3VGTec/3qpG218+fYDiVGQwOJDRxX3KdAFZ5Vy2LfNR6ZRD1k7K+8InMN3+fvhy5DQ7TGij6FCaraaJo52mOe80VJ6/onoO9vVHgs++IBlj8FX0vh+laAKPt62LtM/YTnMYiEjutbKKnP5K5EWm6xTSRR9sgYvvuASQByF1cL1sBZ4Cp4I9gXGBXMTRKwwor+27nmLde+0mixNiu4sGcLpOqyDwL8tOJYjZUODActthTPkMHjFPQ5vXvEnSRxGCfmNX1cChDJYM2kkyc7Zuwcd0ODmuTcNjju33GjZrUaSldsTXoECneX0l/AtArXFejGM8t34B0rIDJ/Lbv3ET4G0L0vTUrM4OGEAXnX4accI3wfa+k7r1OxBwOjXZ9Q0eEOCiwXjyYYIra1VDBZnLRp1Gv254UwuOn5kO9ITWWZ1+MRWtYf1DkHaRxYN3IpPaKQDwr5H2K11YKPP0iVzQrwXVhv8tQu4=
   on:
     branch: v0.1.0

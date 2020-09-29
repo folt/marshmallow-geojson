@@ -11,6 +11,8 @@ marshmallow = "^3.8.0"
 ujson = "^3.2.0"
 
 [tool.poetry.dev-dependencies]
+pytest = "^6.1.0"
+pytest-cov = "^2.10.1"
 
 [build-system]
 requires = ["poetry>=0.12"]

@@ -1,0 +1,7 @@
+[run]
+source = marshmallow_geojson
+branch = True
+
+[report]
+omit =
+    tests/*

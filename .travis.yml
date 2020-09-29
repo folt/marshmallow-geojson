@@ -12,7 +12,6 @@ before_install:
 
 install:
   - poetry install
-  - poetry add pytest-cov
 
 script:
   - pytest --cov=./

@@ -21,7 +21,6 @@ after_success:
 
 before_deploy:
   - poetry config pypi-token.pypi $PYPI_TOKEN
-  - cat $TRAVIS_PYTHON_VERSION
 
 deploy:
   provider: script

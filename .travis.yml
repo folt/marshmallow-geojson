@@ -12,6 +12,8 @@ before_install:
 
 install:
   - poetry install
+  - poetry add pytest-cov
+  - poetry add codecov
 
 script:
   - pytest

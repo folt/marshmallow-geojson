@@ -19,6 +19,7 @@ script:
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 
+
 before_deploy:
 - poetry config pypi-token.pypi $PYPI_TOKEN
 - poetry build
@@ -27,5 +28,6 @@ deploy:
   cleanup: true
   provider: script
   script: poetry publish
+
   on:
     branch: master

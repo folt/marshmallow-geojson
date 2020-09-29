@@ -15,7 +15,7 @@ install:
   - poetry add coverage
 
 script:
-  - pytest --cov=codecov
+  - pytest
 
 after_success:
   - codecov

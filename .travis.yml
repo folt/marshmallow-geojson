@@ -12,7 +12,7 @@ before_install:
 
 install:
   - poetry install
-  - poetry add coverage
+  - poetry add codecov
 
 script:
   - pytest

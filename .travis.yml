@@ -3,8 +3,8 @@ dist: xenial
 language: python
 
 python:
-    - 3.7
-    - 3.8
+  - 3.7
+  - 3.8
 
 before_install:
   - curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
@@ -18,3 +18,13 @@ script:
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+
+deploy:
+  provider: pypi
+  cleanup: true
+  skip_existing: true
+  username: __token__
+  password:
+    secure: $PYPI_TOKEN_SECURE
+  on:
+    branch: master

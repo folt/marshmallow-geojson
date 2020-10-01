@@ -1,110 +1,92 @@
+import ujson
+import typing
+
 import marshmallow as ma
-
-from marshmallow.validate import (
-    OneOf,
+from marshmallow import (
+    types
 )
-from marshmallow.fields import (
-    Str,
-)
-from .point import (
-    PointSchema
-)
-from .multi_polygon import (
-    MultiPolygonSchema
-)
-from .line_string import (
-    LineStringSchema
-)
-from .multi_line_string import (
-    MultiLineStringSchema
-)
-from .polygon import (
-    PolygonSchema
-)
-from .multi_point import (
-    MultiPointSchema
-)
-from .geometry_collection import (
-    GeometryCollectionSchema
-)
-from .feature import (
-    FeatureSchema
-)
-from .feature_collection import (
-    FeatureCollectionSchema
-)
-from .object_type import (
-    GeoJSONType,
-)
+from .point import PointSchema
+from .multi_polygon import MultiPolygonSchema
+from .line_string import LineStringSchema
+from .multi_line_string import MultiLineStringSchema
+from .polygon import PolygonSchema
+from .multi_point import MultiPointSchema
+from .geometry_collection import GeometryCollectionSchema
+from .feature import FeatureSchema
+from .feature_collection import FeatureCollectionSchema
+from .object_type import GeoJSONType
 
 
-class AbstractGeoObject(ma.Schema):
-    type_field = 'type'
-    object_type_schemas = {
-        GeoJSONType.point: PointSchema,
-        GeoJSONType.multi_point: MultiPointSchema,
-        GeoJSONType.line_string: LineStringSchema,
-        GeoJSONType.multi_line_string: MultiLineStringSchema,
-        GeoJSONType.polygon: PolygonSchema,
-        GeoJSONType.multi_polygon: MultiPolygonSchema,
-        GeoJSONType.geometry_collection: GeometryCollectionSchema,
-        GeoJSONType.feature: FeatureSchema,
-        GeoJSONType.feature_collection: FeatureCollectionSchema,
-    }
+class GeoJSONSchema(ma.Schema):
+    point_schema = PointSchema
+    multi_point_schema = MultiPointSchema
+    line_string_schema = LineStringSchema
+    multi_line_string_schema = MultiLineStringSchema
+    polygon_schema = PolygonSchema
+    multi_polygon_schema = MultiPolygonSchema
+    geometry_collection_schema = GeometryCollectionSchema
+    feature_schema = FeatureSchema
+    feature_collection_schema = FeatureCollectionSchema
 
-    def _dump(self, obj, **kwargs):
-        if obj is None:
-            return None, {'_schema': f'Unknown object class'}
-        obj_type = obj.__class__.__name__
+    def __init__(self, *args, **kwargs):
+        super(GeoJSONSchema, self).__init__(*args, **kwargs)
+        self.object_type_map = {
+            GeoJSONType.point.value: self.point_schema,
+            GeoJSONType.multi_point.value: self.multi_point_schema,
+            GeoJSONType.line_string.value: self.line_string_schema,
+            GeoJSONType.multi_line_string.value: self.multi_line_string_schema,
+            GeoJSONType.polygon.value: self.polygon_schema,
+            GeoJSONType.multi_polygon.value: self.multi_polygon_schema,
+            GeoJSONType.geometry_collection.value: self.geometry_collection_schema,
+            GeoJSONType.feature.value: self.feature_schema,
+            GeoJSONType.feature_collection.value: self.feature_collection_schema,
+        }
 
-        type_schema = self.object_type_schemas.get(obj_type)
-        if type_schema is None:
-            return None, {'_schema': f'Unsupported object type: {obj_type}'}
+    def _get_instance_schema(self, data):
+        object_type = data.get('type')
+        if object_type is None:
+            raise ma.ValidationError({'_schema': f'Invalid geo json type'})
+        print(object_type)
 
-        if isinstance(type_schema, ma.Schema):
-            schema = type_schema
-        else:
-            schema = type_schema()
+        schema = self.object_type_map.get(object_type)
+        if schema is None:
+            raise ma.ValidationError({'_schema': f'Invalid {object_type} type'})
+        return schema()
 
-        schema.context.update(getattr(self, "context", {}))
-        result = schema.dump(obj, many=False, **kwargs)
+    def dump(self, obj: typing.Any, *, many: bool = None):
+        raise NotImplementedError
 
-        if result is not None:
-            result[self.type_field] = obj_type
-        return result
+    def dumps(self, obj: typing.Any, *args, many: bool = None, **kwargs):
+        raise NotImplementedError
 
-    def dump(self, obj, *, many=None, **kwargs):
-        result_data = []
-        result_errors = {}
-        many = self.many if many is None else bool(many)
+    def load(
+        self,
+        data: typing.Union[
+            typing.Mapping[str, typing.Any],
+            typing.Iterable[typing.Mapping[str, typing.Any]],
+        ],
+        *,
+        many: bool = None,
+        partial: typing.Union[bool, types.StrSequenceOrSet] = None,
+        unknown: str = None
+    ):
+        schema = self._get_instance_schema(data)
+        return schema._do_load(
+            data, many=many, partial=partial, unknown=unknown, postprocess=True
+        )
 
-        if many:
-            for index, item in enumerate(obj):
-                try:
-                    result = self._dump(item, **kwargs)
-                    result_data.append(result)
-                except ma.ValidationError as error:
-                    result_errors[idx] = error.normalized_messages()
-                    result_data.append(error.valid_data)
-        else:
-            result = result_data = self._dump(obj, **kwargs)
+    def loads(
+        self,
+        json_data: str,
+        *,
+        many: bool = None,
+        partial: typing.Union[bool, types.StrSequenceOrSet] = None,
+        unknown: str = None,
+        **kwargs
+    ):
+        data = self.opts.render_module.loads(json_data, **kwargs)
+        schema = self._get_instance_schema(data)
+        return schema.load(data, many=many, partial=partial, unknown=unknown)
 
-
-
-        result = result_data
-        errors = result_errors
-
-        if not errors:
-            return result
-        else:
-            exc = ma.ValidationError(errors, data=obj, valid_data=result)
-            raise exc
-
-
-class GeoJSON(AbstractGeoObject):
-    type = Str(
-        required=True,
-        validate=OneOf(
-            [json_type.value for json_type in GeoJSONType],
-            error='Unavailable GeoJSON type'),
-    )
+    class Meta:
+        render_module = ujson

@@ -5,7 +5,6 @@ from marshmallow.fields import (
 from marshmallow.validate import (
     OneOf,
 )
-
 from .object_type import (
     LINE_STRING,
 )

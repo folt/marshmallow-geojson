@@ -1,11 +1,8 @@
-from .feature import (
-    FeatureSchema
+from .point import (
+    PointSchema
 )
-from .feature_collection import (
-    FeatureCollectionSchema
-)
-from .geometry_collection import (
-    GeometryCollectionSchema
+from .multi_polygon import (
+    MultiPolygonSchema
 )
 from .line_string import (
     LineStringSchema
@@ -13,17 +10,20 @@ from .line_string import (
 from .multi_line_string import (
     MultiLineStringSchema
 )
+from .polygon import (
+    PolygonSchema
+)
 from .multi_point import (
     MultiPointSchema
 )
-from .multi_polygon import (
-    MultiPolygonSchema
+from .geometry_collection import (
+    GeometryCollectionSchema
 )
-from .point import (
-    PointSchema
+from .feature import (
+    FeatureSchema
 )
-from .polygon import (
-    PolygonSchema
+from .feature_collection import (
+    FeatureCollectionSchema
 )
 from .geojson import (
     GeoJSON,
@@ -56,15 +56,15 @@ __all__ = (
     'GeoJSONType',
 
     # schemas
-    'FeatureSchema',
-    'FeatureCollectionSchema',
-    'GeometryCollectionSchema',
+    'PointSchema',
+    'MultiPointSchema',
     'LineStringSchema',
     'MultiLineStringSchema',
-    'MultiPointSchema',
-    'MultiPolygonSchema',
-    'PointSchema',
     'PolygonSchema',
+    'MultiPolygonSchema',
+    'GeometryCollectionSchema',
+    'FeatureSchema',
+    'FeatureCollectionSchema',
 
     # fields
     'CoordinateField',

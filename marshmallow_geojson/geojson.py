@@ -75,7 +75,7 @@ class GeoJSONSchema(ma.Schema):
         unknown: str = None
     ):
         schema = self.get_instance_schema(data)
-        return schema.load(
+        return schema._do_load(
             data, many=many, partial=partial, unknown=unknown, postprocess=True
         )
 
@@ -90,7 +90,7 @@ class GeoJSONSchema(ma.Schema):
     ):
         data = self.opts.render_module.loads(json_data, **kwargs)
         schema = self.get_instance_schema(data)
-        return schema.load(data, many=many, partial=partial, unknown=unknown)
+        return schema.loads(data, many=many, partial=partial, unknown=unknown)
 
     class Meta:
         render_module = ujson

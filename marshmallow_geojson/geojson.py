@@ -42,15 +42,19 @@ class GeoJSONSchema(ma.Schema):
             GeoJSONType.feature_collection.value: self.feature_collection_schema,
         }
 
-    def _get_instance_schema(self, data):
-        object_type = data.get('type')
-        if object_type is None:
-            raise ma.ValidationError({'_schema': f'Invalid geo json type'})
-        print(object_type)
+    def __validator_geo_json_type(self, geo_type: typing.Any):
+        if geo_type not in [g_type.value for g_type in GeoJSONType]:
+            raise ma.ValidationError(
+                {'_schema': f'Type {geo_type} not available in GeoJSON.'})
 
-        schema = self.object_type_map.get(object_type)
-        if schema is None:
-            raise ma.ValidationError({'_schema': f'Invalid {object_type} type'})
+        if geo_type not in self.object_type_map:
+            raise ma.ValidationError(
+                {'_schema': f'Unknown object class for {geo_type}.'})
+        return geo_type
+
+    def get_instance_schema(self, data):
+        object_type = self.__validator_geo_json_type(data['type'])
+        schema = self.object_type_map[object_type]
         return schema()
 
     def dump(self, obj: typing.Any, *, many: bool = None):
@@ -70,8 +74,8 @@ class GeoJSONSchema(ma.Schema):
         partial: typing.Union[bool, types.StrSequenceOrSet] = None,
         unknown: str = None
     ):
-        schema = self._get_instance_schema(data)
-        return schema._do_load(
+        schema = self.get_instance_schema(data)
+        return schema.load(
             data, many=many, partial=partial, unknown=unknown, postprocess=True
         )
 
@@ -85,7 +89,7 @@ class GeoJSONSchema(ma.Schema):
         **kwargs
     ):
         data = self.opts.render_module.loads(json_data, **kwargs)
-        schema = self._get_instance_schema(data)
+        schema = self.get_instance_schema(data)
         return schema.load(data, many=many, partial=partial, unknown=unknown)
 
     class Meta:

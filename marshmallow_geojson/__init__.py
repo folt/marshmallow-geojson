@@ -9,7 +9,6 @@ from .feature import FeatureSchema
 from .feature_collection import FeatureCollectionSchema
 from .object_type import GeoJSONType
 from .geojson import GeoJSONSchema
-
 from .object_type import (
     GeometryType,
     GeoJSONType,

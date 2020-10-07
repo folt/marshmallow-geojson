@@ -90,6 +90,7 @@ class GeoJSONSchema(ma.Schema):
     ):
         data = self.opts.render_module.loads(json_data, **kwargs)
         schema = self.get_instance_schema(data)
+        print(data)
         return schema.loads(data, many=many, partial=partial, unknown=unknown)
 
     class Meta:

@@ -1,5 +1,5 @@
-import marshmallow as ma
 from marshmallow.fields import (
+    Tuple,
     Str,
 )
 from marshmallow.validate import (
@@ -8,12 +8,23 @@ from marshmallow.validate import (
 from .object_type import (
     POINT,
 )
+from ._base import (
+    BaseSchema,
+    lon,
+    lat,
+)
 
 
-class PointSchema(ma.Schema):
+class PointSchema(BaseSchema):
     type = Str(
         required=True,
         validate=OneOf(
             [POINT],
-            error='Invalid point type'),
+            error='Invalid point type'
+        )
+    )
+
+    coordinates = Tuple(
+        required=True,
+        tuple_fields=(lon, lat)
     )

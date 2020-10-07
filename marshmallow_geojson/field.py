@@ -4,16 +4,23 @@ from marshmallow import (
 )
 
 
-class CoordinateField(fields.Field):
+class CoordinatesField(fields.Field):
     default_error_messages = {
         'invalid': 'Not a valid coordinate.'
     }
-    coordinate_type = float
+
+    def __init__(
+        self,
+        coordinate_type: float = float,
+        *args,
+        **kwargs,
+    ):
+        super(CoordinatesField, self).__init__(*args, **kwargs)
+        self.coordinate_type = coordinate_type
 
     def _format_coordinate(self, value):
-        lon = self.coordinate_type(value[0])
-        lat = self.coordinate_type(value[1])
-        return [lon, lat]
+        lon, lat = value
+        return [self.coordinate_type(lon), self.coordinate_type(lat)]
 
     def _validate_coordinate(self, value):
         if len(value) != 2:
@@ -33,12 +40,12 @@ class CoordinateField(fields.Field):
         return self._validated(value)
 
 
-class CoordinatesField(CoordinateField):
-
-    def _validated(self, value):
-        if value is None:
-            return []
-        return [self._validate_coordinate(item) for item in value]
+# class CoordinatesField(CoordinateField):
+#
+#     def _validated(self, value):
+#         if value is None:
+#             return []
+#         return [self._validate_coordinate(item) for item in value]
 
 
 class GeometryField(fields.Field):

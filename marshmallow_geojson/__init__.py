@@ -13,10 +13,6 @@ from .object_type import (
     GeometryType,
     GeoJSONType,
 )
-from .field import (
-    CoordinateField,
-    CoordinatesField,
-)
 
 __author__ = 'Aliaksandr Vaskevich'
 __maintainer__ = __author__
@@ -46,10 +42,6 @@ __all__ = (
     'GeometryCollectionSchema',
     'FeatureSchema',
     'FeatureCollectionSchema',
-
-    # fields
-    'CoordinateField',
-    'CoordinatesField',
 
     'GeoJSONSchema',
 )

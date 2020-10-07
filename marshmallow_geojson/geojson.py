@@ -1,4 +1,3 @@
-import ujson
 import typing
 
 import marshmallow as ma
@@ -15,9 +14,10 @@ from .geometry_collection import GeometryCollectionSchema
 from .feature import FeatureSchema
 from .feature_collection import FeatureCollectionSchema
 from .object_type import GeoJSONType
+from ._base import BaseSchema
 
 
-class GeoJSONSchema(ma.Schema):
+class GeoJSONSchema(BaseSchema):
     point_schema = PointSchema
     multi_point_schema = MultiPointSchema
     line_string_schema = LineStringSchema
@@ -75,9 +75,7 @@ class GeoJSONSchema(ma.Schema):
         unknown: str = None
     ):
         schema = self.get_instance_schema(data)
-        return schema._do_load(
-            data, many=many, partial=partial, unknown=unknown, postprocess=True
-        )
+        return schema.load(data, many=many, partial=partial, unknown=unknown)
 
     def loads(
         self,
@@ -90,8 +88,7 @@ class GeoJSONSchema(ma.Schema):
     ):
         data = self.opts.render_module.loads(json_data, **kwargs)
         schema = self.get_instance_schema(data)
-        print(data)
-        return schema.loads(data, many=many, partial=partial, unknown=unknown)
 
-    class Meta:
-        render_module = ujson
+        return schema.loads(
+            json_data, many=many, partial=partial, unknown=unknown
+        )

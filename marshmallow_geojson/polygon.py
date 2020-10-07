@@ -1,19 +1,35 @@
-import marshmallow as ma
 from marshmallow.fields import (
+    List,
+    Tuple,
     Str,
 )
 from marshmallow.validate import (
     OneOf,
 )
 from .object_type import (
-    LINE_STRING,
+    POLYGON,
+)
+from ._base import (
+    BaseSchema,
+    lon,
+    lat,
 )
 
 
-class PolygonSchema(ma.Schema):
+class PolygonSchema(BaseSchema):
     type = Str(
         required=True,
         validate=OneOf(
-            [LINE_STRING],
-            error='Invalid polygon type'),
+            [POLYGON],
+            error='Invalid polygon type'
+        )
+    )
+
+    coordinates = List(
+        List(
+            Tuple([lon, lat], required=True),
+            required=True
+        ),
+        required=True,
+        validate=None
     )

@@ -1,6 +1,4 @@
-from marshmallow_geojson import (
-    object_type,
-)
+from marshmallow_geojson import object_type
 
 
 class TestFormatStringType:

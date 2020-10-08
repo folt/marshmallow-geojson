@@ -16,7 +16,7 @@ Point_                 ✅
 MultiPoint_            ❌
 LineString_            ❌
 MultiLineString_       ❌
-Polygon_               ❌
+Polygon_               ✅
 MultiPolygon_          ❌
 GeometryCollection_    ❌
 Feature_               ❌

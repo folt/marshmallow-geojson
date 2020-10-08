@@ -1,5 +1,6 @@
-import marshmallow as ma
 from marshmallow.fields import (
+    List,
+    Tuple,
     Str,
 )
 from marshmallow.validate import (
@@ -8,12 +9,23 @@ from marshmallow.validate import (
 from .object_type import (
     LINE_STRING,
 )
+from ._base import (
+    BaseSchema,
+    lon,
+    lat,
+)
 
 
-class LineStringSchema(ma.Schema):
+class LineStringSchema(BaseSchema):
     type = Str(
         required=True,
         validate=OneOf(
             [LINE_STRING],
-            error='Invalid line string type'),
+            error='Invalid line string type'
+        )
+    )
+
+    coordinates = List(
+        Tuple([lon, lat], required=True),
+        required=True,
     )

@@ -6,15 +6,16 @@ data = {'type': 'Point', 'coordinates': [-105.01621, 39.57422]}
 data_text = ujson.dumps(data)
 
 
-class TestPointSchemaStringType:
+class TestPointSchema:
     def test_loads_schema(self):
-        point_schema = PointSchema()
-        point_data = point_schema.loads(data_text)
-        lon, lat = point_data['coordinates']
-        assert data['type'] == point_data['type']
+        p_schema = PointSchema()
+        p_data = p_schema.loads(data_text)
+
+        lon, lat = p_data['coordinates']
+        assert data['type'] == p_data['type']
         assert data['coordinates'] == [lon, lat]
 
     def test_schema_type(self):
-        point_schema = PointSchema()
-        point_data = point_schema.loads(data_text)
-        assert POINT == point_data['type']
+        p_schema = PointSchema()
+        p_data = p_schema.loads(data_text)
+        assert POINT == p_data['type']

@@ -17,18 +17,20 @@ data = {
 data_text = ujson.dumps(data)
 
 
-class TestPointSchemaStringType:
+class TestPolygonSchema:
     def test_loads_schema(self):
-        point_schema = PolygonSchema()
-        point_data = point_schema.loads(data_text)
-        for pi_key, polygon_item in enumerate(point_data['coordinates']):
-            for pl_key, polygon_coordinate in enumerate(polygon_item):
-                lon, lat = polygon_coordinate
+        p_schema = PolygonSchema()
+        p_data = p_schema.loads(data_text)
+
+        coordinates = p_data['coordinates']
+        for pi_key, p_item in enumerate(coordinates):
+            for pl_key, p_coordinate in enumerate(p_item):
+                lon, lat = p_coordinate
                 assert data['coordinates'][pi_key][pl_key] == [lon, lat]
 
-        assert data['type'] == point_data['type']
+        assert data['type'] == p_data['type']
 
     def test_schema_type(self):
-        point_schema = PolygonSchema()
-        point_data = point_schema.loads(data_text)
-        assert POLYGON == point_data['type']
+        p_schema = PolygonSchema()
+        p_data = p_schema.loads(data_text)
+        assert POLYGON == p_data['type']

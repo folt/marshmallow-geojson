@@ -26,5 +26,5 @@ class PointSchema(BaseSchema):
 
     coordinates = Tuple(
         required=True,
-        tuple_fields=(lon, lat)
+        tuple_fields=(lon, lat),
     )

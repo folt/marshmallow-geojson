@@ -31,5 +31,4 @@ class PolygonSchema(BaseSchema):
             required=True
         ),
         required=True,
-        validate=None
     )

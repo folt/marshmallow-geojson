@@ -21,7 +21,7 @@ class MultiPointSchema(BaseSchema):
         required=True,
         validate=OneOf(
             [MULTI_POINT],
-            error='Invalid point type'
+            error='Invalid multi point type'
         )
     )
 

@@ -1,5 +1,6 @@
-import marshmallow as ma
 from marshmallow.fields import (
+    List,
+    Tuple,
     Str,
 )
 from marshmallow.validate import (
@@ -8,12 +9,30 @@ from marshmallow.validate import (
 from .object_type import (
     MULTI_POLYGON,
 )
+from ._base import (
+    BaseSchema,
+    lon,
+    lat,
+)
 
 
-class MultiPolygonSchema(ma.Schema):
+class MultiPolygonSchema(BaseSchema):
     type = Str(
         required=True,
         validate=OneOf(
             [MULTI_POLYGON],
-            error='Invalid multi polygon type'),
+            error='Invalid multi polygon type'
+        )
     )
+
+    coordinates = List(
+        List(
+            List(
+                Tuple([lon, lat], required=True),
+                required=True
+            ),
+            required=True,
+        ),
+        required=True,
+    )
+

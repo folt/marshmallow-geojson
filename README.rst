@@ -67,10 +67,11 @@ Simple example data:
 
 .. code-block::
 
-  {
-    "type": "Point",
-    "coordinates": [-105.01621, 39.57422]
-  }
+  >>> from marshmallow_geojson import GeoJSONSchema
+  >>> data_string = '{"type": "Point","coordinates": [-105.01621, 39.57422]}'
+  >>> geojson_schema = GeoJSONSchema()
+  >>> geojson_schema.loads(geojson_text)
+  {'type': 'Point', 'coordinates': (-105.01621, 39.57422)}
 
 
 MultiPoint
@@ -196,18 +197,11 @@ Simple example data:
 
 .. code-block::
 
-  {
-    "type": "Polygon",
-    "coordinates": [
-        [
-            [100, 0],
-            [101, 0],
-            [101, 1],
-            [100, 1],
-            [100, 0]
-        ]
-    ]
-  }
+  >>> from marshmallow_geojson import GeoJSONSchema
+  >>> data_string = '{"type": "Polygon", "coordinates": [ [ [100, 0], [101, 0], [101, 1], [100, 1], [100, 0] ] ]}'
+  >>> geojson_schema = GeoJSONSchema()
+  >>> geojson_schema.loads(geojson_text)
+  {'type': 'Polygon', 'coordinates': [[(100.0, 0.0), (101.0, 0.0), (101.0, 1.0), (100.0, 1.0), (100.0, 0.0)]]}
 
 
 MultiPolygon

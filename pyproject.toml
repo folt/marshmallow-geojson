@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "marshmallow_geojson"
-version = "0.1.15"
+version = "0.1.16"
 description = "Marshmallow schema validation for GeoJson"
 authors = [
   "Aliaksandr Vaskevich <vaskevic.an@gmail.com>",

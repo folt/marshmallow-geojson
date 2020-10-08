@@ -17,7 +17,7 @@ MultiPoint_            ✅
 LineString_            ✅
 MultiLineString_       ✅
 Polygon_               ✅
-MultiPolygon_          ❌
+MultiPolygon_          ✅
 GeometryCollection_    ❌
 Feature_               ❌
 FeatureCollection_     ❌
@@ -133,59 +133,11 @@ Simple example data:
 
 .. code-block::
 
-  {
-    "type": "MultiPolygon",
-    "coordinates": [
-        [
-            [
-                [
-                    107,
-                    7
-                ],
-                [
-                    108,
-                    7
-                ],
-                [
-                    108,
-                    8
-                ],
-                [
-                    107,
-                    8
-                ],
-                [
-                    107,
-                    7
-                ]
-            ]
-        ],
-        [
-            [
-                [
-                    100,
-                    0
-                ],
-                [
-                    101,
-                    0
-                ],
-                [
-                    101,
-                    1
-                ],
-                [
-                    100,
-                    1
-                ],
-                [
-                    100,
-                    0
-                ]
-            ]
-        ]
-    ]
-  }
+  >>> from marshmallow_geojson import GeoJSONSchema
+  >>> data_string = '{"type": "MultiPolygon", "coordinates": [ [ [ [107, 7], [108, 7], [108, 8], [107, 8], [107, 7] ] ], [ [ [100, 0], [101, 0], [101, 1], [100, 1], [100, 0] ] ] ]}'
+  >>> geojson_schema = GeoJSONSchema()
+  >>> geojson_schema.loads(geojson_text)
+  {'type': 'MultiPolygon', 'coordinates': [[[(107.0, 7.0), (108.0, 7.0), (108.0, 8.0), (107.0, 8.0), (107.0, 7.0)]], [[(100.0, 0.0), (101.0, 0.0), (101.0, 1.0), (100.0, 1.0), (100.0, 0.0)]]]}
 
 
 GeometryCollection

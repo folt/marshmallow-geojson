@@ -57,12 +57,6 @@ class GeoJSONSchema(BaseSchema):
         schema = self.object_type_map[object_type]
         return schema()
 
-    def dump(self, obj: typing.Any, *, many: bool = None):
-        raise NotImplementedError
-
-    def dumps(self, obj: typing.Any, *args, many: bool = None, **kwargs):
-        raise NotImplementedError
-
     def load(
         self,
         data: typing.Union[

@@ -1,5 +1,6 @@
-import marshmallow as ma
 from marshmallow.fields import (
+    List,
+    Tuple,
     Str,
 )
 from marshmallow.validate import (
@@ -8,12 +9,24 @@ from marshmallow.validate import (
 from .object_type import (
     MULTI_POINT,
 )
+from ._base import (
+    BaseSchema,
+    lon,
+    lat,
+)
 
 
-class MultiPointSchema(ma.Schema):
+class MultiPointSchema(BaseSchema):
     type = Str(
         required=True,
         validate=OneOf(
             [MULTI_POINT],
-            error='Invalid multi point type'),
+            error='Invalid point type'
+        )
     )
+
+    coordinates = List(
+        Tuple([lon, lat], required=True),
+        required=True
+    )
+

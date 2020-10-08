@@ -13,7 +13,7 @@ marshmallow_geojson 🌍
 GeoJSON Objects        Status
 ====================   =======
 Point_                 ✅
-MultiPoint_            ❌
+MultiPoint_            ✅
 LineString_            ✅
 MultiLineString_       ❌
 Polygon_               ✅
@@ -80,19 +80,11 @@ Simple example data:
 
 .. code-block::
 
-  {
-    "type": "MultiPoint",
-    "coordinates": [
-        [
-            -105.01621,
-            39.57422
-        ],
-        [
-            -80.666513,
-            35.053994
-        ]
-    ]
-  }
+  >>> from marshmallow_geojson import GeoJSONSchema
+  >>> data_string = '{"type": "MultiPoint", "coordinates": [ [-105.01621, 39.57422], [-80.666513, 35.053994] ]}'
+  >>> geojson_schema = GeoJSONSchema()
+  >>> geojson_schema.loads(geojson_text)
+  {'type': 'MultiPoint', 'coordinates': [(-105.01621, 39.57422), (-80.666513, 35.053994)]}
 
 
 LineString

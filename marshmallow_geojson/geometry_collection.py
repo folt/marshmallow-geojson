@@ -1,5 +1,5 @@
-import marshmallow as ma
 from marshmallow.fields import (
+    Tuple,
     Str,
 )
 from marshmallow.validate import (
@@ -8,12 +8,24 @@ from marshmallow.validate import (
 from .object_type import (
     GEOMETRY_COLLECTION,
 )
+from ._base import (
+    BaseSchema,
+    lon,
+    lat,
+)
 
 
-class GeometryCollectionSchema(ma.Schema):
+class GeometryCollectionSchema(BaseSchema):
     type = Str(
         required=True,
         validate=OneOf(
             [GEOMETRY_COLLECTION],
-            error='Invalid geometry collection type'),
+            error='Invalid geometry collection type',
+        )
     )
+
+    coordinates = Tuple(
+        required=True,
+        tuple_fields=(lon, lat),
+    )
+

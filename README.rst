@@ -6,6 +6,10 @@
    :target: https://codecov.io/gh/folt/marshmallow-geojson
    :alt: Codecov
 
+.. image:: https://pepy.tech/badge/marshmallow-geojson
+   :target: https://pepy.tech/project/marshmallow-geojson
+   :alt: Downloads
+
 marshmallow_geojson 🌍
 ======================
 
@@ -18,7 +22,7 @@ LineString_            ✅
 MultiLineString_       ✅
 Polygon_               ✅
 MultiPolygon_          ✅
-GeometryCollection_    ❌
+GeometryCollection_    ✅
 Feature_               ❌
 FeatureCollection_     ❌
 ====================   =======

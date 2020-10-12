@@ -31,7 +31,3 @@ class BaseSchema(ma.Schema):
 
     class Meta:
         render_module = ujson
-
-
-class GeometriesSchema(BaseSchema):
-

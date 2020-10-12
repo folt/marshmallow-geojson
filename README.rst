@@ -150,62 +150,11 @@ Simple example data:
 
 .. code-block::
 
-  {
-    "type": "GeometryCollection",
-    "geometries": [
-        {
-            "type": "Point",
-            "coordinates": [
-                -80.660805,
-                35.049392
-            ]
-        },
-        {
-            "type": "Polygon",
-            "coordinates": [
-                [
-                    [
-                        -80.664582,
-                        35.044965
-                    ],
-                    [
-                        -80.663874,
-                        35.04428
-                    ],
-                    [
-                        -80.662586,
-                        35.04558
-                    ],
-                    [
-                        -80.663444,
-                        35.046036
-                    ],
-                    [
-                        -80.664582,
-                        35.044965
-                    ]
-                ]
-            ]
-        },
-        {
-            "type": "LineString",
-            "coordinates": [
-                [
-                    -80.662372,
-                    35.059509
-                ],
-                [
-                    -80.662693,
-                    35.059263
-                ],
-                [
-                    -80.662844,
-                    35.05893
-                ]
-            ]
-        }
-    ]
-  }
+  >>> from marshmallow_geojson import GeoJSONSchema
+  >>> data_string = '{"type": "GeometryCollection", "geometries": [{"type": "Point", "coordinates": [-80.660805, 35.049392]}, {"type": "Polygon", "coordinates": [ [ [-80.664582, 35.044965], [-80.663874, 35.04428], [-80.662586, 35.04558], [-80.663444, 35.046036], [-80.664582, 35.044965] ] ]}, {"type": "LineString", "coordinates": [[-80.662372, 35.059509], [-80.662693, 35.059263], [-80.662844, 35.05893] ]}]}'
+  >>> geojson_schema = GeoJSONSchema()
+  >>> geojson_schema.loads(geojson_text)
+  {'type': 'GeometryCollection', 'geometries': [{'type': 'Point', 'coordinates': (-80.660805, 35.049392)}, {'type': 'Polygon', 'coordinates': [[(-80.664582, 35.044965), (-80.663874, 35.04428), (-80.662586, 35.04558), (-80.663444, 35.046036), (-80.664582, 35.044965)]]}, {'type': 'LineString', 'coordinates': [(-80.662372, 35.059509), (-80.662693, 35.059263), (-80.662844, 35.05893)]}]}
 
 
 Feature

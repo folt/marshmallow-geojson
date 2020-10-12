@@ -8,6 +8,7 @@ from .geometry_collection import GeometryCollectionSchema
 from .feature import FeatureSchema
 from .feature_collection import FeatureCollectionSchema
 from .object_type import GeoJSONType
+from .geometry import GeometriesSchema
 from .geojson import GeoJSONSchema
 from .object_type import (
     GeometryType,
@@ -19,7 +20,7 @@ __maintainer__ = __author__
 
 __email__ = 'vaskevic.an@gmail.com'
 __license__ = 'MIT'
-__version__ = '0.1.0'
+__version__ = '0.1.18'
 
 __all__ = (
     '__author__',
@@ -43,5 +44,6 @@ __all__ = (
     'FeatureSchema',
     'FeatureCollectionSchema',
 
+    'GeometriesSchema',
     'GeoJSONSchema',
 )

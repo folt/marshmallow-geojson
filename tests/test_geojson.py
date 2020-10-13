@@ -6,7 +6,7 @@ data = {'type': 'Point', 'coordinates': [-105.01621, 39.57422]}
 data_text = ujson.dumps(data)
 
 
-class TestFeatureCollectionSchema:
+class TestGeoJSONSchema:
     def test_loads_schema(self):
         g_schema = GeoJSONSchema()
         g_data = g_schema.loads(data_text)

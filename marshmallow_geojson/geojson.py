@@ -43,10 +43,6 @@ class GeoJSONSchema(BaseSchema):
         }
 
     def __validator_geo_json_type(self, geo_type: typing.Any):
-        if geo_type not in [g_type.value for g_type in GeoJSONType]:
-            raise ma.ValidationError(
-                {'_schema': f'Type {geo_type} not available in GeoJSON.'})
-
         if geo_type not in self.object_type_map:
             raise ma.ValidationError(
                 {'_schema': f'Unknown object class for {geo_type}.'})

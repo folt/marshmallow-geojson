@@ -23,8 +23,8 @@ MultiLineString_       ✅
 Polygon_               ✅
 MultiPolygon_          ✅
 GeometryCollection_    ✅
-Feature_               ❌
-FeatureCollection_     ❌
+Feature_               ✅
+FeatureCollection_     ✅
 ====================   =======
 
 Installation
@@ -176,59 +176,12 @@ Simple example data:
 
 .. code-block::
 
-  {
-    "type": "FeatureCollection",
-    "features": [
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    -80.870885,
-                    35.215151
-                ]
-            },
-            "properties": {
-                "name": "ABBOTT NEIGHBORHOOD PARK",
-                "address": "1300  SPRUCE ST"
-            }
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "Polygon",
-                "coordinates": [
-                    [
-                        [
-                            -80.724878,
-                            35.265454
-                        ],
-                        [
-                            -80.722646,
-                            35.260338
-                        ],
-                        [
-                            -80.720329,
-                            35.260618
-                        ],
-                        [
-                            -80.704793,
-                            35.268397
-                        ],
+  >>> from marshmallow_geojson import GeoJSONSchema
+  >>> data_string = '{"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": {"type": "Point", "coordinates": [-80.870885, 35.215151] }, "properties": {} }, {"type": "Feature", "geometry": {"type": "Polygon", "coordinates": [ [ [-80.724878, 35.265454], [-80.722646, 35.260338], [-80.720329, 35.260618], [-80.704793, 35.268397], [-80.724878, 35.265454] ] ]}, "properties": {}} ] }'
+  >>> geojson_schema = GeoJSONSchema()
+  >>> geojson_schema.loads(geojson_text)
+  {'type': 'FeatureCollection', 'features': [{'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': (-80.870885, 35.215151)}, 'properties': {}}, {'type': 'Feature', 'geometry': {'type': 'Polygon', 'coordinates': [[(-80.724878, 35.265454), (-80.722646, 35.260338), (-80.720329, 35.260618), (-80.704793, 35.268397), (-80.724878, 35.265454)]]}, 'properties': {}}]}
 
-                        [
-                            -80.724878,
-                            35.265454
-                        ]
-                    ]
-                ]
-            },
-            "properties": {
-                "name": "Plaza Road Park"
-            }
-        }
-    ]
-  }
 
 .. _GeoJSON: http://geojson.org/
 .. _poetry: https://python-poetry.org/

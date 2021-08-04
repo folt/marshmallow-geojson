@@ -20,8 +20,8 @@ lon = Number(
 lat = Number(
     required=True,
     validate=Range(
-        min=-180,
-        max=180,
+        min=-90,
+        max=90,
         error='Latitude must be between -90, 90'
     )
 )

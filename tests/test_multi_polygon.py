@@ -1,4 +1,4 @@
-import ujson
+import json
 from marshmallow_geojson import MultiPolygonSchema
 from marshmallow_geojson.object_type import MULTI_POLYGON
 
@@ -25,7 +25,7 @@ data = {
         ]
     ]
 }
-data_text = ujson.dumps(data)
+data_text = json.dumps(data)
 
 
 class TestMultiPolygonSchema:

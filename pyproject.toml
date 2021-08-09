@@ -38,11 +38,9 @@ classifiers = [
   "License :: OSI Approved :: MIT License",
 ]
 
-
 [tool.poetry.dependencies]
 python = "^3.7"
 marshmallow = "^3.8.0"
-ujson = "^4.0.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.1.0"

@@ -1,4 +1,4 @@
-import ujson
+import json
 from marshmallow_geojson import FeatureCollectionSchema
 from marshmallow_geojson.object_type import FEATURE_COLLECTION
 
@@ -31,7 +31,7 @@ data = {
         }
     ]
 }
-data_text = ujson.dumps(data)
+data_text = json.dumps(data)
 
 
 class TestFeatureCollectionSchema:

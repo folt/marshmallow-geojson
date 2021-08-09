@@ -1,9 +1,9 @@
-import ujson
+import json
 from marshmallow_geojson import GeoJSONSchema
 from marshmallow_geojson.object_type import GeoJSONType
 
 data = {'type': 'Point', 'coordinates': [-105.01621, 39.57422]}
-data_text = ujson.dumps(data)
+data_text = json.dumps(data)
 
 
 class TestGeoJSONSchema:

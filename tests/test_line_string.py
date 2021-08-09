@@ -1,4 +1,4 @@
-import ujson
+import json
 from marshmallow_geojson import LineStringSchema
 from marshmallow_geojson.object_type import LINE_STRING
 
@@ -11,7 +11,7 @@ data = {
         [-98.448486, 38.848264]
     ]
 }
-data_text = ujson.dumps(data)
+data_text = json.dumps(data)
 
 
 class TestLineStringSchema:

@@ -1,4 +1,4 @@
-import ujson
+import json
 
 import marshmallow as ma
 from marshmallow.fields import (
@@ -30,4 +30,4 @@ lat = Number(
 class BaseSchema(ma.Schema):
 
     class Meta:
-        render_module = ujson
+        render_module = json

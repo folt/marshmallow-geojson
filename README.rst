@@ -1,4 +1,4 @@
-.. image:: https://travis-ci.org/folt/marshmallow-geojson.svg
+.. image:: https://travis-ci.com/folt/marshmallow-geojson.svg
    :target: https://travis-ci.com/github/folt/marshmallow-geojson
    :alt: Travis
 

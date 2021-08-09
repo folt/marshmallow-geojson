@@ -1,4 +1,4 @@
-import ujson
+import json
 from marshmallow_geojson import MultiLineStringSchema
 from marshmallow_geojson.object_type import MULTI_LINE_STRING
 
@@ -25,7 +25,7 @@ data = {
         ]
     ]
 }
-data_text = ujson.dumps(data)
+data_text = json.dumps(data)
 
 
 class TestMultiLineStringSchema:

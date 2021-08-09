@@ -1,4 +1,4 @@
-import ujson
+import json
 from marshmallow_geojson import MultiPointSchema
 from marshmallow_geojson.object_type import MULTI_POINT
 
@@ -9,7 +9,7 @@ data = {
         [-80.666513, 35.053994]
     ]
 }
-data_text = ujson.dumps(data)
+data_text = json.dumps(data)
 
 
 class TestMultiPointSchema:

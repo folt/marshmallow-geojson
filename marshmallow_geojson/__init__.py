@@ -10,6 +10,8 @@ from .feature_collection import FeatureCollectionSchema
 from .object_type import GeoJSONType
 from .geometry import GeometriesSchema
 from .geojson import GeoJSONSchema
+from .property import PropertiesSchema
+
 from .object_type import (
     GeometryType,
     GeoJSONType,
@@ -32,6 +34,9 @@ __all__ = (
     # object type
     'GeometryType',
     'GeoJSONType',
+
+    # property schemas
+    'PropertiesSchema',
 
     # schemas
     'PointSchema',

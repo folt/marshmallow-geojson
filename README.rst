@@ -1,6 +1,13 @@
-.. image:: https://travis-ci.com/folt/marshmallow-geojson.svg
-   :target: https://travis-ci.com/github/folt/marshmallow-geojson
-   :alt: Travis
+marshmallow_geojson 🌍
+======================
+
+.. image:: https://github.com/folt/marshmallow-geojson/actions/workflows/main.yml/badge.svg
+   :target: https://github.com/folt/marshmallow-geojson/actions?query=workflow%3A%22Python+package%22
+   :alt: GitHub Actions status for master branch
+
+.. image:: https://badge.fury.io/py/marshmallow-geojson.svg
+   :target: https://pypi.org/project/marshmallow-geojson/
+   :alt: Latest PyPI package version
 
 .. image:: https://codecov.io/gh/folt/marshmallow-geojson/branch/master/graph/badge.svg?token=B5ATYXLBHO
    :target: https://codecov.io/gh/folt/marshmallow-geojson
@@ -10,8 +17,6 @@
    :target: https://pepy.tech/project/marshmallow-geojson
    :alt: Downloads
 
-marshmallow_geojson 🌍
-======================
 
 ====================   =======
 GeoJSON Objects        Status

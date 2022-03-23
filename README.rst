@@ -1,6 +1,3 @@
-marshmallow_geojson 🌍
-======================
-
 .. image:: https://github.com/folt/marshmallow-geojson/actions/workflows/main.yml/badge.svg
    :target: https://github.com/folt/marshmallow-geojson/actions?query=workflow%3A%22Python+package%22
    :alt: GitHub Actions status for master branch
@@ -16,6 +13,9 @@ marshmallow_geojson 🌍
 .. image:: https://pepy.tech/badge/marshmallow-geojson
    :target: https://pepy.tech/project/marshmallow-geojson
    :alt: Downloads
+
+marshmallow_geojson 🌍
+======================
 
 
 ====================   =======

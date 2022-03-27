@@ -1,21 +1,16 @@
-from .point import PointSchema
-from .multi_polygon import MultiPolygonSchema
-from .line_string import LineStringSchema
-from .multi_line_string import MultiLineStringSchema
-from .polygon import PolygonSchema
-from .multi_point import MultiPointSchema
-from .geometry_collection import GeometryCollectionSchema
 from .feature import FeatureSchema
 from .feature_collection import FeatureCollectionSchema
-from .object_type import GeoJSONType
-from .geometry import GeometriesSchema
 from .geojson import GeoJSONSchema
+from .geometry import GeometriesSchema
+from .geometry_collection import GeometryCollectionSchema
+from .line_string import LineStringSchema
+from .multi_line_string import MultiLineStringSchema
+from .multi_point import MultiPointSchema
+from .multi_polygon import MultiPolygonSchema
+from .object_type import GeoJSONType, GeometryType
+from .point import PointSchema
+from .polygon import PolygonSchema
 from .property import PropertiesSchema
-
-from .object_type import (
-    GeometryType,
-    GeoJSONType,
-)
 
 __author__ = 'Aliaksandr Vaskevich'
 __maintainer__ = __author__

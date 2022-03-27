@@ -1,19 +1,8 @@
-from marshmallow.fields import (
-    List,
-    Tuple,
-    Str,
-)
-from marshmallow.validate import (
-    OneOf,
-)
-from .object_type import (
-    MULTI_POINT,
-)
-from ._base import (
-    BaseSchema,
-    lon,
-    lat,
-)
+from marshmallow.fields import List, Str, Tuple
+from marshmallow.validate import OneOf
+
+from ._base import BaseSchema, lat, lon
+from .object_type import MULTI_POINT
 
 
 class MultiPointSchema(BaseSchema):

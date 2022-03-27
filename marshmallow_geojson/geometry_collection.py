@@ -1,16 +1,9 @@
-from marshmallow.fields import (
-    Nested,
-    List,
-    Str,
-)
-from marshmallow.validate import (
-    OneOf,
-)
-from .object_type import (
-    GEOMETRY_COLLECTION,
-)
+from marshmallow.fields import List, Nested, Str
+from marshmallow.validate import OneOf
+
 from ._base import BaseSchema
 from .geometry import GeometriesSchema
+from .object_type import GEOMETRY_COLLECTION
 
 
 class GeometryCollectionSchema(BaseSchema):

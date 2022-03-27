@@ -1,16 +1,9 @@
-from marshmallow.fields import (
-    Nested,
-    List,
-    Str,
-)
-from marshmallow.validate import (
-    OneOf,
-)
-from .object_type import (
-    FEATURE_COLLECTION,
-)
+from marshmallow.fields import List, Nested, Str
+from marshmallow.validate import OneOf
+
 from ._base import BaseSchema
 from .feature import FeatureSchema
+from .object_type import FEATURE_COLLECTION
 
 
 class FeatureCollectionSchema(BaseSchema):

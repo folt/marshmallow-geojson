@@ -1,12 +1,8 @@
 import json
 
 import marshmallow as ma
-from marshmallow.fields import (
-    Number,
-)
-from marshmallow.validate import (
-    Range,
-)
+from marshmallow.fields import Number
+from marshmallow.validate import Range
 
 lon = Number(
     required=True,

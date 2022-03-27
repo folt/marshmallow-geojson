@@ -1,4 +1,5 @@
 import json
+
 from marshmallow_geojson import PolygonSchema
 from marshmallow_geojson.object_type import POLYGON
 

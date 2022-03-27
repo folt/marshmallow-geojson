@@ -1,4 +1,5 @@
 import json
+
 from marshmallow_geojson import PointSchema
 from marshmallow_geojson.object_type import POINT
 

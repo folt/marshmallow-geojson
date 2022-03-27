@@ -1,4 +1,5 @@
 import json
+
 from marshmallow_geojson import GeoJSONSchema
 from marshmallow_geojson.object_type import GeoJSONType
 

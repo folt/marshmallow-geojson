@@ -4,13 +4,13 @@ import marshmallow as ma
 from marshmallow import types
 
 from ._base import BaseSchema
-from .point import PointSchema
-from .multi_polygon import MultiPolygonSchema
 from .line_string import LineStringSchema
 from .multi_line_string import MultiLineStringSchema
-from .polygon import PolygonSchema
 from .multi_point import MultiPointSchema
+from .multi_polygon import MultiPolygonSchema
 from .object_type import GeometryType
+from .point import PointSchema
+from .polygon import PolygonSchema
 
 
 class GeometriesSchema(BaseSchema):

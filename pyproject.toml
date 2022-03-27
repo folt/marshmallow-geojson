@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "marshmallow_geojson"
-version = "0.2.4"
+version = "0.2.3"
 description = "Marshmallow schema validation for GeoJson"
 authors = [
   "Aliaksandr Vaskevich <vaskevic.an@gmail.com>",
@@ -43,10 +43,9 @@ python = "^3.7"
 marshmallow = "^3.8.0"
 
 [tool.poetry.dev-dependencies]
+isort = "^5.10.1"
 pytest = "^6.1.0"
 pytest-cov = "^2.10.1"
-tox = "^3.20.0"
-tox-travis = "^0.12"
 
 [build-system]
 requires = ["poetry>=0.12"]

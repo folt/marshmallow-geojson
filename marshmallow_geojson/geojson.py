@@ -1,20 +1,19 @@
 import typing
 
 import marshmallow as ma
-from marshmallow import (
-    types
-)
-from .point import PointSchema
-from .multi_polygon import MultiPolygonSchema
-from .line_string import LineStringSchema
-from .multi_line_string import MultiLineStringSchema
-from .polygon import PolygonSchema
-from .multi_point import MultiPointSchema
-from .geometry_collection import GeometryCollectionSchema
+from marshmallow import types
+
+from ._base import BaseSchema
 from .feature import FeatureSchema
 from .feature_collection import FeatureCollectionSchema
+from .geometry_collection import GeometryCollectionSchema
+from .line_string import LineStringSchema
+from .multi_line_string import MultiLineStringSchema
+from .multi_point import MultiPointSchema
+from .multi_polygon import MultiPolygonSchema
 from .object_type import GeoJSONType
-from ._base import BaseSchema
+from .point import PointSchema
+from .polygon import PolygonSchema
 
 
 class GeoJSONSchema(BaseSchema):

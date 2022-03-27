@@ -1,4 +1,5 @@
 import json
+
 from marshmallow_geojson import FeatureSchema
 from marshmallow_geojson.object_type import FEATURE
 

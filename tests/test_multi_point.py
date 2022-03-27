@@ -1,4 +1,5 @@
 import json
+
 from marshmallow_geojson import MultiPointSchema
 from marshmallow_geojson.object_type import MULTI_POINT
 

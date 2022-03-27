@@ -1,4 +1,5 @@
 import json
+
 from marshmallow_geojson import MultiLineStringSchema
 from marshmallow_geojson.object_type import MULTI_LINE_STRING
 

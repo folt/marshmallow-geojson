@@ -3,34 +3,12 @@ import json
 from marshmallow_geojson import MultiPolygonSchema
 from marshmallow_geojson.object_type import MULTI_POLYGON
 
-data = {
-    "type": "MultiPolygon",
-    "coordinates": [
-        [
-            [
-                [107, 7],
-                [108, 7],
-                [108, 8],
-                [107, 8],
-                [107, 7]
-            ]
-        ],
-        [
-            [
-                [100, 0],
-                [101, 0],
-                [101, 1],
-                [100, 1],
-                [100, 0]
-            ]
-        ]
-    ]
-}
-data_text = json.dumps(data)
-
 
 class TestMultiPolygonSchema:
-    def test_loads_schema(self):
+    def test_loads_schema(self, get_multi_polygon_data):
+        multi_polygon_dc = get_multi_polygon_data
+        data_text = json.dumps(multi_polygon_dc)
+
         mp_schema = MultiPolygonSchema()
         mp_data = mp_schema.loads(data_text)
 
@@ -39,12 +17,16 @@ class TestMultiPolygonSchema:
             for mp_item_key, mp_item in enumerate(mp_list):
                 for mpl_key, mp_coordinate in enumerate(mp_item):
                     lon, lat = mp_coordinate
-                    assert data['coordinates'][mp_list_key][mp_item_key][
-                               mpl_key] == [lon, lat]
+                    assert multi_polygon_dc[
+                               'coordinates'
+                           ][mp_list_key][mp_item_key][mpl_key] == [lon, lat]
 
-        assert data['type'] == mp_data['type']
+        assert multi_polygon_dc['type'] == mp_data['type']
 
-    def test_schema_type(self):
+    def test_schema_type(self, get_multi_polygon_data):
+        multi_polygon_dc = get_multi_polygon_data
+        data_text = json.dumps(multi_polygon_dc)
+
         mp_schema = MultiPolygonSchema()
         mp_data = mp_schema.loads(data_text)
         assert MULTI_POLYGON == mp_data['type']

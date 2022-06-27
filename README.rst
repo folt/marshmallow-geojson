@@ -30,6 +30,8 @@ MultiPolygon_          ✅
 GeometryCollection_    ✅
 Feature_               ✅
 FeatureCollection_     ✅
+Bbox_                  ✅
+
 ====================   =======
 
 Installation
@@ -216,6 +218,38 @@ Simple example data:
   >>> geojson_schema = GeoJSONSchema()
   >>> geojson_schema.loads(geojson_text)
   {'type': 'FeatureCollection', 'features': [{'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': (-80.870885, 35.215151)}, 'properties': {}}, {'type': 'Feature', 'geometry': {'type': 'Polygon', 'coordinates': [[(-80.724878, 35.265454), (-80.722646, 35.260338), (-80.720329, 35.260618), (-80.704793, 35.268397), (-80.724878, 35.265454)]]}, 'properties': {}}]}
+
+Bbox
+------------------
+Set bbox:
+
+.. code-block::
+
+  from marshmallow.fields import List, Number
+  from marshmallow_geojson import PolygonSchema
+  from marshmallow_geojson.validate import Bbox
+
+    class MyBboxSchema(PolygonSchema):
+        bbox = List(
+            Number(
+                required=True,
+            ),
+            required=True,
+            validate=Bbox(
+                min_lon=-180,
+                max_lon=180,
+                min_lat=-90,
+                max_lat=90,
+            ),
+        )
+
+.. code-block::
+
+  >>> geojson_text = '{"type": "Polygon", "bbox": [10, 10, 10, 10] , "coordinates": [[[100, 0], [101, 0], [101, 1], [100, 1], [100, 0]]]}'
+  >>> my_bbox_schema = MyBboxSchema()
+  >>> my_bbox_schema.loads(geojson_text)
+  {'type': 'Polygon', 'bbox': [10, 10, 10, 10] , 'coordinates': [[[100, 0], [101, 0], [101, 1], [100, 1], [100, 0]]]}
+
 
 
 .. _GeoJSON: http://geojson.org/

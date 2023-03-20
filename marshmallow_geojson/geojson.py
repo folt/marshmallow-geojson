@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import typing
 
 import marshmallow as ma
@@ -27,8 +29,33 @@ class GeoJSONSchema(BaseSchema):
     feature_schema = FeatureSchema
     feature_collection_schema = FeatureCollectionSchema
 
-    def __init__(self, *args, **kwargs):
-        super(GeoJSONSchema, self).__init__(*args, **kwargs)
+    _default_error_messages = {
+        'type': 'Invalid input type.',
+    }
+
+    def __init__(
+        self,
+        *,
+        only: types.StrSequenceOrSet | None = None,
+        exclude: types.StrSequenceOrSet = (),
+        many: bool = False,
+        context: dict | None = None,
+        load_only: types.StrSequenceOrSet = (),
+        dump_only: types.StrSequenceOrSet = (),
+        partial: bool | types.StrSequenceOrSet = False,
+        unknown: str | None = None,
+    ):
+        super().__init__(
+            only=only,
+            exclude=exclude,
+            many=many,
+            context=context,
+            load_only=load_only,
+            dump_only=dump_only,
+            partial=partial,
+            unknown=unknown,
+        )
+
         self.object_type_map = {
             GeoJSONType.point.value: self.point_schema,
             GeoJSONType.multi_point.value: self.multi_point_schema,
@@ -41,16 +68,18 @@ class GeoJSONSchema(BaseSchema):
             GeoJSONType.feature_collection.value: self.feature_collection_schema,
         }
 
-    def __validator_geo_json_type(self, geo_type: typing.Any):
-        if geo_type not in self.object_type_map:
-            raise ma.ValidationError(
-                {'_schema': f'Unknown object class for {geo_type}.'})
-        return geo_type
+    def get_schema(self, object_type: str):
+        if object_type in self.object_type_map:
+            return self.object_type_map[object_type]
+        raise ma.ValidationError(
+            {'_schema': f'Unknown object class for {object_type}.'},
+        )
 
-    def get_instance_schema(self, data):
-        object_type = self.__validator_geo_json_type(data['type'])
-        schema = self.object_type_map[object_type]
-        return schema()
+    def _list_and_many_or_raise(self, data: typing.Any, many: bool):
+        if isinstance(data, list) != many:
+            raise ma.ValidationError(
+                {'_schema': self._default_error_messages['type']},
+            )
 
     def load(
         self,
@@ -63,21 +92,84 @@ class GeoJSONSchema(BaseSchema):
         partial: typing.Union[bool, types.StrSequenceOrSet] = None,
         unknown: str = None
     ):
-        schema = self.get_instance_schema(data)
-        return schema.load(data, many=many, partial=partial, unknown=unknown)
+        many = self.many if many is None else bool(many)
+        self._list_and_many_or_raise(data=data, many=many)
 
-    def loads(
+        if many:
+            result = []
+            for item in data:
+                schema = self.get_schema(item['type'])
+                result.append(
+                    schema(
+                        only=self.only,
+                        exclude=self.exclude,
+                        context=self.context,
+                        load_only=self.load_only,
+                        dump_only=self.dump_only,
+                        partial=self.partial,
+                        unknown=self.unknown,
+                    ).load(
+                        data=item,
+                        partial=partial,
+                        unknown=unknown,
+                    )
+                )
+        else:
+            schema = self.get_schema(data['type'])
+            result = schema(
+                only=self.only,
+                exclude=self.exclude,
+                context=self.context,
+                load_only=self.load_only,
+                dump_only=self.dump_only,
+                partial=self.partial,
+                unknown=self.unknown,
+            ).load(
+                data=data,
+                partial=partial,
+                unknown=unknown,
+            )
+
+        return result
+
+    def dump(
         self,
-        json_data: str,
+        obj: typing.Any,
         *,
-        many: bool = None,
-        partial: typing.Union[bool, types.StrSequenceOrSet] = None,
-        unknown: str = None,
-        **kwargs
+        many: bool | None = None,
     ):
-        data = self.opts.render_module.loads(json_data, **kwargs)
-        schema = self.get_instance_schema(data)
+        many = self.many if many is None else bool(many)
+        self._list_and_many_or_raise(data=obj, many=many)
 
-        return schema.loads(
-            json_data, many=many, partial=partial, unknown=unknown
-        )
+        if many:
+            data = []
+            for item in obj:
+                schema = self.get_schema(item['type'])
+                data.append(
+                    schema(
+                        only=self.only,
+                        exclude=self.exclude,
+                        context=self.context,
+                        load_only=self.load_only,
+                        dump_only=self.dump_only,
+                        partial=self.partial,
+                        unknown=self.unknown,
+                    ).dump(
+                        obj=item,
+                    )
+                )
+        else:
+            schema = self.get_schema(obj['type'])
+            data = schema(
+                only=self.only,
+                exclude=self.exclude,
+                context=self.context,
+                load_only=self.load_only,
+                dump_only=self.dump_only,
+                partial=self.partial,
+                unknown=self.unknown,
+            ).dump(
+                obj=obj,
+            )
+
+        return data

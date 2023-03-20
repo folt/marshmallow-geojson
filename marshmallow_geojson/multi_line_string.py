@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from marshmallow.fields import List, Str, Tuple
 from marshmallow.validate import OneOf
 
@@ -10,7 +12,7 @@ class MultiLineStringSchema(BaseSchema):
         required=True,
         validate=OneOf(
             [MULTI_LINE_STRING],
-            error='Invalid multi line string string type'
+            error='Invalid multi line string string type',
         )
     )
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from marshmallow.fields import List, Str, Tuple
 from marshmallow.validate import OneOf
 
@@ -10,12 +12,12 @@ class MultiPointSchema(BaseSchema):
         required=True,
         validate=OneOf(
             [MULTI_POINT],
-            error='Invalid multi point type'
+            error='Invalid multi point type',
         )
     )
 
     coordinates = List(
         Tuple([lon, lat], required=True),
-        required=True
+        required=True,
     )
 

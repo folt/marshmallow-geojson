@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from marshmallow.fields import List, Str, Tuple
 from marshmallow.validate import OneOf
 
@@ -10,7 +12,7 @@ class MultiPolygonSchema(BaseSchema):
         required=True,
         validate=OneOf(
             [MULTI_POLYGON],
-            error='Invalid multi polygon type'
+            error='Invalid multi polygon type',
         )
     )
 
@@ -18,7 +20,7 @@ class MultiPolygonSchema(BaseSchema):
         List(
             List(
                 Tuple([lon, lat], required=True),
-                required=True
+                required=True,
             ),
             required=True,
         ),

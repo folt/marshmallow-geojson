@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from marshmallow.fields import Str, Tuple
 from marshmallow.validate import OneOf
 
@@ -10,7 +12,7 @@ class PointSchema(BaseSchema):
         required=True,
         validate=OneOf(
             [POINT],
-            error='Invalid point type'
+            error='Invalid point type',
         )
     )
 

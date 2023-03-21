@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from marshmallow.fields import List, Str, Tuple
 from marshmallow.validate import OneOf
 
@@ -10,14 +12,14 @@ class PolygonSchema(BaseSchema):
         required=True,
         validate=OneOf(
             [POLYGON],
-            error='Invalid polygon type'
+            error='Invalid polygon type',
         )
     )
 
     coordinates = List(
         List(
             Tuple([lon, lat], required=True),
-            required=True
+            required=True,
         ),
         required=True,
     )

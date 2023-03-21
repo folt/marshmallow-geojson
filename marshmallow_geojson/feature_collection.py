@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from marshmallow.fields import List, Nested, Str
 from marshmallow.validate import OneOf
 
@@ -10,12 +12,12 @@ class FeatureCollectionSchema(BaseSchema):
     type = Str(
         required=True,
         validate=OneOf(
-            [FEATURE_COLLECTION],
-            error='Invalid feature collection type'
-        )
+            choices=[FEATURE_COLLECTION],
+            error='Invalid feature collection type',
+        ),
     )
 
     features = List(
-        Nested(FeatureSchema),
+        Nested(FeatureSchema()),
         required=True,
     )

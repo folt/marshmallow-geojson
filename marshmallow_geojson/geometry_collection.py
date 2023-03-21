@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from marshmallow.fields import List, Nested, Str
 from marshmallow.validate import OneOf
 
@@ -16,6 +18,6 @@ class GeometryCollectionSchema(BaseSchema):
     )
 
     geometries = List(
-        Nested(GeometriesSchema),
+        Nested(GeometriesSchema()),
         required=True,
     )

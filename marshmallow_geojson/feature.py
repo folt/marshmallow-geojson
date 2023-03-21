@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from marshmallow.fields import Nested, Str
 from marshmallow.validate import OneOf
 
@@ -12,16 +14,16 @@ class FeatureSchema(BaseSchema):
         required=True,
         validate=OneOf(
             [FEATURE],
-            error='Invalid feature type'
+            error='Invalid feature type',
         )
     )
 
     geometry = Nested(
-        GeometriesSchema,
+        GeometriesSchema(),
         required=True,
     )
 
     properties = Nested(
-        PropertiesSchema,
+        PropertiesSchema(),
         required=True,
     )

@@ -110,10 +110,25 @@ Simple example data:
 
   >>> from marshmallow_geojson import GeoJSONSchema
   >>> geojson_text = '{"type": "Point","coordinates": [-105.01621, 39.57422]}'
+  >>> geojson_many_text = '[{"type": "Point","coordinates": [-105.01621, 39.57422]}]'
+  >>> geojson_dc = {"type": "Point","coordinates": [-105.01621, 39.57422]}
+
   >>> geojson_schema = GeoJSONSchema()
   >>> geojson_schema.loads(geojson_text)
   {'type': 'Point', 'coordinates': (-105.01621, 39.57422)}
 
+  >>> geojson_schema.load(geojson_dc)
+  {'type': 'Point', 'coordinates': (-105.01621, 39.57422)}
+
+  >>> geojson_schema.dumps(geojson_dc)
+  {'type': 'Point', 'coordinates': (-105.01621, 39.57422)}
+
+  >>> geojson_schema.dump(geojson_dc)
+  {'type': 'Point', 'coordinates': (-105.01621, 39.57422)}
+
+  >>> geojson_schema = GeoJSONSchema(many=True)
+  >>> geojson_schema.loads(geojson_many_text)
+  [{'type': 'Point', 'coordinates': (-105.01621, 39.57422)}]
 
 MultiPoint
 ------------------

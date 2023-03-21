@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from marshmallow.fields import List, Str, Tuple
 from marshmallow.validate import OneOf
 
@@ -10,7 +12,7 @@ class LineStringSchema(BaseSchema):
         required=True,
         validate=OneOf(
             [LINE_STRING],
-            error='Invalid line string type'
+            error='Invalid line string type',
         )
     )
 

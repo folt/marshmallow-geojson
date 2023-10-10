@@ -14,13 +14,12 @@ class GeometryCollectionSchema(BaseSchema):
         required=True,
         validate=OneOf(
             [GEOMETRY_COLLECTION],
-            error='Invalid geometry collection type',
-        )
+            error="Invalid geometry collection type",
+        ),
     )
 
     geometries = List(
         Nested(GeometriesSchema()),
         required=True,
         metadata=dict(example=GEOJSON_GEOMETRY_COLLECTION["geometries"]),
-    )
     )

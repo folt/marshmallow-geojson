@@ -4,6 +4,7 @@ from marshmallow.fields import List, Nested, Str
 from marshmallow.validate import OneOf
 
 from ._base import BaseSchema
+from .examples import GEOJSON_GEOMETRY_COLLECTION
 from .geometry import GeometriesSchema
 from .object_type import GEOMETRY_COLLECTION
 
@@ -20,4 +21,6 @@ class GeometryCollectionSchema(BaseSchema):
     geometries = List(
         Nested(GeometriesSchema()),
         required=True,
+        metadata=dict(example=GEOJSON_GEOMETRY_COLLECTION["geometries"]),
+    )
     )

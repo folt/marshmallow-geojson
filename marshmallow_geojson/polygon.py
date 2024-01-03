@@ -4,6 +4,7 @@ from marshmallow.fields import List, Str, Tuple
 from marshmallow.validate import OneOf
 
 from ._base import BaseSchema, lat, lon
+from .examples import GEOJSON_POLYGON
 from .object_type import POLYGON
 
 
@@ -12,8 +13,8 @@ class PolygonSchema(BaseSchema):
         required=True,
         validate=OneOf(
             [POLYGON],
-            error='Invalid polygon type',
-        )
+            error="Invalid polygon type",
+        ),
     )
 
     coordinates = List(
@@ -22,4 +23,5 @@ class PolygonSchema(BaseSchema):
             required=True,
         ),
         required=True,
+        metadata=dict(example=GEOJSON_POLYGON["coordinates"]),
     )

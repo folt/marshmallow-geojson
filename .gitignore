@@ -219,6 +219,3 @@ artifacts/
 
 # pytest:
 .pytest_cache/
-
-# poetry lock file:
-poetry.lock

@@ -240,13 +240,13 @@ Set bbox:
 
 .. code-block::
 
-  from marshmallow.fields import List, Number
+  from marshmallow.fields import List, Float
   from marshmallow_geojson import PolygonSchema
   from marshmallow_geojson.validate import Bbox
 
     class MyBboxSchema(PolygonSchema):
         bbox = List(
-            Number(
+            Float(
                 required=True,
             ),
             required=True,

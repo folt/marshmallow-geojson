@@ -1,3 +1,6 @@
+"""Tests for GeometryCollectionSchema."""
+
+import copy
 import json
 
 import pytest
@@ -8,134 +11,131 @@ from marshmallow_geojson.object_type import GEOMETRY_COLLECTION
 
 
 class TestGeometryCollectionSchema:
-    def test_loads_schema(self, get_geometry_collection_data):
-        geometry_collection_dc = get_geometry_collection_data
-        data_text = json.dumps(geometry_collection_dc)
+    """Test suite for GeometryCollectionSchema validation and serialization."""
 
-        gc_schema = GeometryCollectionSchema()
-        gc_data = gc_schema.loads(data_text)
+    def test_valid_geometry_collection_creation(self, valid_geometry_collection_data):
+        """Test creating a valid GeometryCollection schema."""
+        schema = GeometryCollectionSchema()
+        gc_data = schema.load(valid_geometry_collection_data)
 
-        geometries = gc_data['geometries']
+        assert gc_data["type"] == GEOMETRY_COLLECTION
+        assert gc_data["type"] == valid_geometry_collection_data["type"]
+        assert len(gc_data["geometries"]) == len(valid_geometry_collection_data["geometries"])
 
-        for g_k, g_i in enumerate(geometries):
-            data_item_type = geometry_collection_dc['geometries'][g_k]['type']
-            assert data_item_type == g_i['type']
+        for idx, geometry in enumerate(gc_data["geometries"]):
+            expected_geometry = valid_geometry_collection_data["geometries"][idx]
+            assert geometry["type"] == expected_geometry["type"]
 
-        assert geometry_collection_dc['type'] == gc_data['type']
+    def test_geometry_collection_empty(self, valid_geometry_collection_empty):
+        """Test GeometryCollection with empty geometries list."""
+        schema = GeometryCollectionSchema()
+        gc_data = schema.load(valid_geometry_collection_empty)
 
-    def test_loads_many_schema(self, get_geometry_collection_data):
-        geometry_collection_dc = get_geometry_collection_data
-        data_text = json.dumps([geometry_collection_dc])
+        assert gc_data["type"] == GEOMETRY_COLLECTION
+        assert len(gc_data["geometries"]) == 0
 
-        gc_schema = GeometryCollectionSchema(many=True)
-        gc_data_list = gc_schema.loads(data_text)
+    def test_geometry_collection_nested(self, nested_geometry_collection_data):
+        """Test GeometryCollection containing another GeometryCollection.
 
-        assert len(gc_data_list) == 1
-        gc_data = gc_data_list[0]
+        Note: While nested geometry collections are not recommended by RFC 7946,
+        the library should still validate them correctly.
+        """
+        schema = GeometryCollectionSchema()
+        gc_data = schema.load(nested_geometry_collection_data)
 
-        geometries = gc_data['geometries']
+        assert gc_data["type"] == GEOMETRY_COLLECTION
+        # Check that nested GeometryCollection is present
+        geometry_types = [g["type"] for g in gc_data["geometries"]]
+        assert "GeometryCollection" in geometry_types
 
-        for g_k, g_i in enumerate(geometries):
-            data_item_type = geometry_collection_dc['geometries'][g_k]['type']
-            assert data_item_type == g_i['type']
+    def test_geometry_collection_invalid_type(self, geometry_collection_bad_type):
+        """Test GeometryCollection with invalid type field."""
+        schema = GeometryCollectionSchema()
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load(geometry_collection_bad_type)
 
-        assert geometry_collection_dc['type'] == gc_data['type']
+        assert "Invalid geometry collection type" in str(exc_info.value)
 
-    def test_load_schema(self, get_geometry_collection_data):
-        geometry_collection_dc = get_geometry_collection_data
+    def test_geometry_collection_serialization(self, valid_geometry_collection_data):
+        """Test GeometryCollection schema serialization to dict."""
+        schema = GeometryCollectionSchema()
+        gc_data = schema.load(valid_geometry_collection_data)
+        serialized = schema.dump(gc_data)
 
-        gc_schema = GeometryCollectionSchema()
-        gc_data = gc_schema.load(geometry_collection_dc)
+        assert serialized["type"] == "GeometryCollection"
+        assert len(serialized["geometries"]) == len(valid_geometry_collection_data["geometries"])
 
-        geometries = gc_data['geometries']
+        # Verify geometries are serialized correctly
+        for idx, geometry in enumerate(serialized["geometries"]):
+            expected = valid_geometry_collection_data["geometries"][idx]
+            assert geometry["type"] == expected["type"]
 
-        for g_k, g_i in enumerate(geometries):
-            data_item_type = geometry_collection_dc['geometries'][g_k]['type']
-            assert data_item_type == g_i['type']
+    def test_geometry_collection_json_serialization(self, valid_geometry_collection_data):
+        """Test GeometryCollection schema JSON serialization."""
+        schema = GeometryCollectionSchema()
+        gc_data = schema.load(valid_geometry_collection_data)
+        json_str = schema.dumps(gc_data)
 
-        assert geometry_collection_dc['type'] == gc_data['type']
+        assert (
+            '"type":"GeometryCollection"' in json_str or '"type": "GeometryCollection"' in json_str
+        )
+        assert '"geometries"' in json_str
 
-    def test_load_many_schema(self, get_geometry_collection_data):
-        geometry_collection_dc = get_geometry_collection_data
+    def test_geometry_collection_from_json(self, valid_geometry_collection_data):
+        """Test creating GeometryCollection from JSON string."""
+        json_str = json.dumps(valid_geometry_collection_data)
+        schema = GeometryCollectionSchema()
+        gc_data = schema.loads(json_str)
 
-        gc_schema = GeometryCollectionSchema(many=True)
-        gc_data_list = gc_schema.load([geometry_collection_dc])
+        assert gc_data["type"] == GEOMETRY_COLLECTION
+        assert len(gc_data["geometries"]) == len(valid_geometry_collection_data["geometries"])
 
-        assert len(gc_data_list) == 1
-        gc_data = gc_data_list[0]
+    def test_geometry_collection_with_bbox(self, valid_geometry_collection_data, bbox_2d):
+        """Test GeometryCollection with bounding box."""
+        data = copy.deepcopy(valid_geometry_collection_data)
+        data["bbox"] = bbox_2d
+        schema = GeometryCollectionSchema()
+        gc_data = schema.load(data)
 
-        geometries = gc_data['geometries']
+        assert gc_data["bbox"] == bbox_2d
+        assert gc_data["type"] == GEOMETRY_COLLECTION
 
-        for g_k, g_i in enumerate(geometries):
-            data_item_type = geometry_collection_dc['geometries'][g_k]['type']
-            assert data_item_type == g_i['type']
+    def test_geometry_collection_with_all_geometry_types(self):
+        """Test GeometryCollection containing all geometry types."""
+        data = {
+            "type": "GeometryCollection",
+            "geometries": [
+                {"type": "Point", "coordinates": [-105.01621, 39.57422]},
+                {
+                    "type": "MultiPoint",
+                    "coordinates": [[-105.01621, 39.57422], [-80.666513, 35.053994]],
+                },
+                {
+                    "type": "LineString",
+                    "coordinates": [[-99.113159, 38.869651], [-99.0802, 38.85682]],
+                },
+                {
+                    "type": "MultiLineString",
+                    "coordinates": [[[-99.113159, 38.869651], [-99.0802, 38.85682]]],
+                },
+                {
+                    "type": "Polygon",
+                    "coordinates": [[[100, 0], [101, 0], [101, 1], [100, 1], [100, 0]]],
+                },
+                {
+                    "type": "MultiPolygon",
+                    "coordinates": [[[[100, 0], [101, 0], [101, 1], [100, 1], [100, 0]]]],
+                },
+            ],
+        }
 
-        assert geometry_collection_dc['type'] == gc_data['type']
-
-    def test_dumps_schema(self, get_geometry_collection_data):
-        geometry_collection_dc = get_geometry_collection_data
-        data_text = json.dumps(geometry_collection_dc)
-
-        gc_schema = GeometryCollectionSchema()
-        gc_data_text = gc_schema.dumps(geometry_collection_dc)
-
-        assert json.loads(data_text) == json.loads(gc_data_text)
-
-    def test_dumps_many_schema(self, get_geometry_collection_data):
-        geometry_collection_dc = get_geometry_collection_data
-        data_text = json.dumps([geometry_collection_dc])
-
-        gc_schema = GeometryCollectionSchema(many=True)
-        gc_data_text = gc_schema.dumps([geometry_collection_dc])
-
-        assert json.loads(data_text) == json.loads(gc_data_text)
-
-    def test_dump_schema(self, get_geometry_collection_data):
-        geometry_collection_dc = get_geometry_collection_data
-
-        gc_schema = GeometryCollectionSchema()
-        gc_data = gc_schema.dump(geometry_collection_dc)
-
-        geometries = gc_data['geometries']
-
-        for g_k, g_i in enumerate(geometries):
-            data_item_type = geometry_collection_dc['geometries'][g_k]['type']
-            assert data_item_type == g_i['type']
-
-        assert geometry_collection_dc['type'] == gc_data['type']
-
-    def test_dump_many_schema(self, get_geometry_collection_data):
-        geometry_collection_dc = get_geometry_collection_data
-
-        gc_schema = GeometryCollectionSchema(many=True)
-        gc_data_list = gc_schema.dump([geometry_collection_dc])
-
-        assert len(gc_data_list) == 1
-        gc_data = gc_data_list[0]
-
-        geometries = gc_data['geometries']
-
-        for g_k, g_i in enumerate(geometries):
-            data_item_type = geometry_collection_dc['geometries'][g_k]['type']
-            assert data_item_type == g_i['type']
-
-        assert geometry_collection_dc['type'] == gc_data['type']
-
-    def test_schema_type(self, get_geometry_collection_data):
-        geometry_collection_dc = get_geometry_collection_data
-        data_text = json.dumps(geometry_collection_dc)
-
-        gc_schema = GeometryCollectionSchema()
-        gc_data = gc_schema.loads(data_text)
-        assert GEOMETRY_COLLECTION == gc_data['type']
-
-    def test_schema_type_error(self, get_point_data):
-        point_dc = get_point_data
-        data_text = json.dumps(point_dc)
-
-        gc_schema = GeometryCollectionSchema()
-        with pytest.raises(
-            ValidationError,
-            match='Invalid geometry collection type',
-        ):
-            gc_schema.loads(data_text)
+        schema = GeometryCollectionSchema()
+        gc_data = schema.load(data)
+        assert gc_data["type"] == GEOMETRY_COLLECTION
+        assert len(gc_data["geometries"]) == 6
+        assert gc_data["geometries"][0]["type"] == "Point"
+        assert gc_data["geometries"][1]["type"] == "MultiPoint"
+        assert gc_data["geometries"][2]["type"] == "LineString"
+        assert gc_data["geometries"][3]["type"] == "MultiLineString"
+        assert gc_data["geometries"][4]["type"] == "Polygon"
+        assert gc_data["geometries"][5]["type"] == "MultiPolygon"

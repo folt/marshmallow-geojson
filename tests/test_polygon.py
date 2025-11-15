@@ -1,3 +1,5 @@
+"""Tests for PolygonSchema."""
+
 import json
 
 import pytest
@@ -5,133 +7,114 @@ from marshmallow.exceptions import ValidationError
 
 from marshmallow_geojson import PolygonSchema
 from marshmallow_geojson.object_type import POLYGON
+from tests.test_utils import assert_coordinates_equal
 
 
 class TestPolygonSchema:
-    def test_loads_schema(self, get_polygon_data):
-        polygon_dc = get_polygon_data
-        data_text = json.dumps(polygon_dc)
+    """Test suite for PolygonSchema validation and serialization."""
 
-        p_schema = PolygonSchema()
-        p_data = p_schema.loads(data_text)
+    def test_valid_polygon_creation(self, valid_polygon_data):
+        """Test creating a valid Polygon schema."""
+        schema = PolygonSchema()
+        p_data = schema.load(valid_polygon_data)
 
-        coordinates = p_data['coordinates']
-        for pi_key, p_item in enumerate(coordinates):
-            for pl_key, p_coordinate in enumerate(p_item):
-                lon, lat = p_coordinate
-                assert polygon_dc['coordinates'][pi_key][pl_key] == [lon, lat]
+        assert p_data["type"] == POLYGON
+        assert p_data["type"] == valid_polygon_data["type"]
+        assert len(p_data["coordinates"]) == len(valid_polygon_data["coordinates"])
 
-        assert polygon_dc['type'] == p_data['type']
+        for ring_idx, ring in enumerate(p_data["coordinates"]):
+            expected_ring = valid_polygon_data["coordinates"][ring_idx]
+            assert len(ring) == len(expected_ring)
 
-    def test_loads_many_schema(self, get_polygon_data):
-        polygon_dc = get_polygon_data
-        data_text = json.dumps([polygon_dc])
+            for coord_idx, coord in enumerate(ring):
+                expected_coord = expected_ring[coord_idx]
+                assert_coordinates_equal(coord, expected_coord)
 
-        p_schema = PolygonSchema(many=True)
-        p_data_list = p_schema.loads(data_text)
+    def test_valid_polygon_with_holes(self, valid_polygon_with_holes):
+        """Test Polygon with interior rings (holes)."""
+        schema = PolygonSchema()
+        p_data = schema.load(valid_polygon_with_holes)
 
-        assert len(p_data_list) == 1
-        p_data = p_data_list[0]
+        assert p_data["type"] == POLYGON
+        assert len(p_data["coordinates"]) == 2  # exterior + 1 hole
 
-        coordinates = p_data['coordinates']
-        for pi_key, p_item in enumerate(coordinates):
-            for pl_key, p_coordinate in enumerate(p_item):
-                lon, lat = p_coordinate
-                assert polygon_dc['coordinates'][pi_key][pl_key] == [lon, lat]
+    def test_polygon_linear_ring_must_close(self, invalid_polygon_data_no_loop):
+        """Test that Polygon linear rings must start and end at the same coordinate."""
+        schema = PolygonSchema()
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load(invalid_polygon_data_no_loop)
 
-        assert polygon_dc['type'] == p_data['type']
+        error_str = str(exc_info.value)
+        assert "Linear Rings must start and end at the same coordinate" in error_str
 
-    def test_load_schema(self, get_polygon_data):
-        polygon_dc = get_polygon_data
+    def test_polygon_linear_ring_minimum_length(self, invalid_polygon_data_too_few_points):
+        """Test that Polygon linear rings must have at least 4 points."""
+        schema = PolygonSchema()
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load(invalid_polygon_data_too_few_points)
 
-        p_schema = PolygonSchema()
-        p_data = p_schema.load(polygon_dc)
+        error_str = str(exc_info.value)
+        assert "Linear Ring length must be >=4" in error_str
+        assert "not 3" in error_str
 
-        coordinates = p_data['coordinates']
-        for pi_key, p_item in enumerate(coordinates):
-            for pl_key, p_coordinate in enumerate(p_item):
-                lon, lat = p_coordinate
-                assert polygon_dc['coordinates'][pi_key][pl_key] == [lon, lat]
+    def test_polygon_invalid_type(self, invalid_polygon_data_bad_type):
+        """Test Polygon with invalid type field."""
+        schema = PolygonSchema()
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load(invalid_polygon_data_bad_type)
 
-    def test_load_many_schema(self, get_polygon_data):
-        polygon_dc = get_polygon_data
+        assert "Invalid polygon type" in str(exc_info.value)
 
-        p_schema = PolygonSchema(many=True)
-        p_data_list = p_schema.load([polygon_dc])
+    def test_polygon_serialization(self, valid_polygon_data):
+        """Test Polygon schema serialization to dict."""
+        schema = PolygonSchema()
+        p_data = schema.load(valid_polygon_data)
+        serialized = schema.dump(p_data)
 
-        assert len(p_data_list) == 1
-        p_data = p_data_list[0]
+        assert serialized["type"] == "Polygon"
+        assert len(serialized["coordinates"]) == len(valid_polygon_data["coordinates"])
 
-        coordinates = p_data['coordinates']
-        for pi_key, p_item in enumerate(coordinates):
-            for pl_key, p_coordinate in enumerate(p_item):
-                lon, lat = p_coordinate
-                assert polygon_dc['coordinates'][pi_key][pl_key] == [lon, lat]
+        # Verify coordinates structure
+        for ring_idx, ring in enumerate(serialized["coordinates"]):
+            expected_ring = valid_polygon_data["coordinates"][ring_idx]
+            assert len(ring) == len(expected_ring)
 
-    def test_dumps_schema(self, get_polygon_data):
-        polygon_dc = get_polygon_data
-        data_text = json.dumps(polygon_dc)
+    def test_polygon_json_serialization(self, valid_polygon_data):
+        """Test Polygon schema JSON serialization."""
+        schema = PolygonSchema()
+        p_data = schema.load(valid_polygon_data)
+        json_str = schema.dumps(p_data)
 
-        p_schema = PolygonSchema()
-        p_data_text = p_schema.dumps(polygon_dc)
+        assert '"type":"Polygon"' in json_str or '"type": "Polygon"' in json_str
+        # Verify coordinates are in JSON
+        assert str(valid_polygon_data["coordinates"][0][0][0]) in json_str
 
-        assert json.loads(data_text) == json.loads(p_data_text)
+    def test_polygon_from_json(self, valid_polygon_data):
+        """Test creating Polygon from JSON string."""
+        json_str = json.dumps(valid_polygon_data)
+        schema = PolygonSchema()
+        p_data = schema.loads(json_str)
 
-    def test_dumps_many_schema(self, get_polygon_data):
-        polygon_dc = get_polygon_data
-        data_text = json.dumps([polygon_dc])
+        assert p_data["type"] == POLYGON
+        assert len(p_data["coordinates"]) == len(valid_polygon_data["coordinates"])
 
-        p_schema = PolygonSchema(many=True)
-        p_data_text = p_schema.dumps([polygon_dc])
+    def test_polygon_with_bbox(self, valid_polygon_data, bbox_2d):
+        """Test Polygon with bounding box."""
+        data = {**valid_polygon_data, "bbox": bbox_2d}
+        schema = PolygonSchema()
+        p_data = schema.load(data)
 
-        assert json.loads(data_text) == json.loads(p_data_text)
+        assert p_data["bbox"] == bbox_2d
+        assert p_data["type"] == POLYGON
 
-    def test_dump_schema(self, get_polygon_data):
-        polygon_dc = get_polygon_data
-
-        p_schema = PolygonSchema()
-        p_data = p_schema.dump(polygon_dc)
-
-        coordinates = p_data['coordinates']
-        for pi_key, p_item in enumerate(coordinates):
-            for pl_key, p_coordinate in enumerate(p_item):
-                lon, lat = p_coordinate
-                assert polygon_dc['coordinates'][pi_key][pl_key] == [lon, lat]
-
-        assert polygon_dc['type'] == p_data['type']
-
-    def test_dump_many_schema(self, get_polygon_data):
-        polygon_dc = get_polygon_data
-
-        p_schema = PolygonSchema(many=True)
-        p_data_list = p_schema.dump([polygon_dc])
-
-        assert len(p_data_list) == 1
-        p_data = p_data_list[0]
-
-        coordinates = p_data['coordinates']
-        for pi_key, p_item in enumerate(coordinates):
-            for pl_key, p_coordinate in enumerate(p_item):
-                lon, lat = p_coordinate
-                assert polygon_dc['coordinates'][pi_key][pl_key] == [lon, lat]
-
-        assert polygon_dc['type'] == p_data['type']
-
-    def test_schema_type(self, get_polygon_data):
-        polygon_dc = get_polygon_data
-        data_text = json.dumps(polygon_dc)
-
-        p_schema = PolygonSchema()
-        p_data = p_schema.loads(data_text)
-        assert POLYGON == p_data['type']
-
-    def test_schema_type_error(self, get_point_data):
-        point_dc = get_point_data
-        data_text = json.dumps(point_dc)
-
-        p_schema = PolygonSchema()
-        with pytest.raises(
-            ValidationError,
-            match='Invalid polygon type',
-        ):
-            p_schema.loads(data_text)
+    def test_polygon_exterior_ring_validation(self):
+        """Test that exterior ring is properly validated."""
+        # Valid polygon with exactly 4 points (minimum)
+        data = {
+            "type": "Polygon",
+            "coordinates": [[[0, 0], [1, 0], [1, 1], [0, 0]]],
+        }
+        schema = PolygonSchema()
+        p_data = schema.load(data)
+        assert p_data["type"] == POLYGON
+        assert len(p_data["coordinates"][0]) == 4

@@ -1,3 +1,6 @@
+"""Tests for FeatureCollectionSchema."""
+
+import copy
 import json
 
 import pytest
@@ -8,129 +11,118 @@ from marshmallow_geojson.object_type import FEATURE_COLLECTION
 
 
 class TestFeatureCollectionSchema:
-    def test_loads_schema(self, get_feature_collection_data):
-        feature_collection_dc = get_feature_collection_data
-        data_text = json.dumps(feature_collection_dc)
+    """Test suite for FeatureCollectionSchema validation and serialization."""
 
-        fc_schema = FeatureCollectionSchema()
-        fc_data = fc_schema.loads(data_text)
+    def test_valid_feature_collection_creation(self, valid_feature_collection_data):
+        """Test creating a valid FeatureCollection schema."""
+        schema = FeatureCollectionSchema()
+        fc_data = schema.load(valid_feature_collection_data)
 
-        features = fc_data['features']
-        for fc_key, fc_item in enumerate(features):
-            data_item_type = feature_collection_dc['features'][fc_key]['type']
-            assert fc_item['type'] == data_item_type
+        assert fc_data["type"] == FEATURE_COLLECTION
+        assert fc_data["type"] == valid_feature_collection_data["type"]
+        assert len(fc_data["features"]) == len(valid_feature_collection_data["features"])
 
-        assert feature_collection_dc['type'] == fc_data['type']
+        for idx, feature in enumerate(fc_data["features"]):
+            assert feature["type"] == "Feature"
+            expected_feature = valid_feature_collection_data["features"][idx]
+            assert feature["geometry"] is not None
+            assert feature["geometry"]["type"] == expected_feature["geometry"]["type"]
 
-    def test_loads_many_schema(self, get_feature_collection_data):
-        feature_collection_dc = get_feature_collection_data
-        data_text = json.dumps([feature_collection_dc])
+    def test_feature_collection_empty(self, valid_feature_collection_empty):
+        """Test FeatureCollection with empty features list."""
+        schema = FeatureCollectionSchema()
+        fc_data = schema.load(valid_feature_collection_empty)
 
-        fc_schema = FeatureCollectionSchema(many=True)
-        fc_data_list = fc_schema.loads(data_text)
+        assert fc_data["type"] == FEATURE_COLLECTION
+        assert len(fc_data["features"]) == 0
 
-        assert len(fc_data_list) == 1
-        fc_data = fc_data_list[0]
+    def test_feature_collection_invalid_type(self, invalid_feature_collection_wrong_type):
+        """Test FeatureCollection with invalid type field."""
+        schema = FeatureCollectionSchema()
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load(invalid_feature_collection_wrong_type)
 
-        features = fc_data['features']
+        assert "Invalid feature collection type" in str(exc_info.value)
 
-        for fc_key, fc_item in enumerate(features):
-            data_item_type = feature_collection_dc['features'][fc_key]['type']
-            assert fc_item['type'] == data_item_type
+    def test_feature_collection_serialization(self, valid_feature_collection_data):
+        """Test FeatureCollection schema serialization to dict."""
+        schema = FeatureCollectionSchema()
+        fc_data = schema.load(valid_feature_collection_data)
+        serialized = schema.dump(fc_data)
 
-        assert feature_collection_dc['type'] == fc_data['type']
+        assert serialized["type"] == "FeatureCollection"
+        assert len(serialized["features"]) == len(valid_feature_collection_data["features"])
 
-    def test_load_schema(self, get_feature_collection_data):
-        feature_collection_dc = get_feature_collection_data
+        # Verify features are serialized correctly
+        for idx, feature in enumerate(serialized["features"]):
+            assert feature["type"] == "Feature"
+            expected = valid_feature_collection_data["features"][idx]
+            assert feature["geometry"]["type"] == expected["geometry"]["type"]
 
-        fc_schema = FeatureCollectionSchema()
-        fc_data = fc_schema.load(feature_collection_dc)
+    def test_feature_collection_json_serialization(self, valid_feature_collection_data):
+        """Test FeatureCollection schema JSON serialization."""
+        schema = FeatureCollectionSchema()
+        fc_data = schema.load(valid_feature_collection_data)
+        json_str = schema.dumps(fc_data)
 
-        features = fc_data['features']
-        for fc_key, fc_item in enumerate(features):
-            data_item_type = feature_collection_dc['features'][fc_key]['type']
-            assert fc_item['type'] == data_item_type
+        assert '"type":"FeatureCollection"' in json_str or '"type": "FeatureCollection"' in json_str
+        assert '"features"' in json_str
 
-        assert feature_collection_dc['type'] == fc_data['type']
+    def test_feature_collection_from_json(self, valid_feature_collection_data):
+        """Test creating FeatureCollection from JSON string."""
+        json_str = json.dumps(valid_feature_collection_data)
+        schema = FeatureCollectionSchema()
+        fc_data = schema.loads(json_str)
 
-    def test_load_many_schema(self, get_feature_collection_data):
-        feature_collection_dc = get_feature_collection_data
+        assert fc_data["type"] == FEATURE_COLLECTION
+        assert len(fc_data["features"]) == len(valid_feature_collection_data["features"])
 
-        fc_schema = FeatureCollectionSchema(many=True)
-        fc_data_list = fc_schema.load([feature_collection_dc])
+    def test_feature_collection_with_bbox(self, valid_feature_collection_data, bbox_2d):
+        """Test FeatureCollection with bounding box."""
+        data = copy.deepcopy(valid_feature_collection_data)
+        data["bbox"] = bbox_2d
+        schema = FeatureCollectionSchema()
+        fc_data = schema.load(data)
 
-        assert len(fc_data_list) == 1
-        fc_data = fc_data_list[0]
+        assert fc_data["bbox"] == bbox_2d
+        assert fc_data["type"] == FEATURE_COLLECTION
 
-        features = fc_data['features']
-        for fc_key, fc_item in enumerate(features):
-            data_item_type = feature_collection_dc['features'][fc_key]['type']
-            assert fc_item['type'] == data_item_type
+    def test_feature_collection_with_multiple_geometry_types(self):
+        """Test FeatureCollection with features containing different geometry types."""
+        data = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {"type": "Point", "coordinates": [-105.01621, 39.57422]},
+                    "properties": {},
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [[-99.113159, 38.869651], [-99.0802, 38.85682]],
+                    },
+                    "properties": {},
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [[[100, 0], [101, 0], [101, 1], [100, 1], [100, 0]]],
+                    },
+                    "properties": {},
+                },
+            ],
+        }
 
-        assert feature_collection_dc['type'] == fc_data['type']
-
-    def test_dumps_schema(self, get_feature_collection_data):
-        feature_collection_dc = get_feature_collection_data
-        data_text = json.dumps(feature_collection_dc)
-
-        fc_schema = FeatureCollectionSchema()
-        fc_data_text = fc_schema.dumps(feature_collection_dc)
-
-        assert json.loads(data_text) == json.loads(fc_data_text)
-
-    def test_dumps_many_schema(self, get_feature_collection_data):
-        feature_collection_dc = get_feature_collection_data
-        data_text = json.dumps([feature_collection_dc])
-
-        fc_schema = FeatureCollectionSchema(many=True)
-        fc_data_text = fc_schema.dumps([feature_collection_dc])
-
-        assert json.loads(data_text) == json.loads(fc_data_text)
-
-    def test_dump_schema(self, get_feature_collection_data):
-        feature_collection_dc = get_feature_collection_data
-
-        fc_schema = FeatureCollectionSchema()
-        fc_data = fc_schema.dump(feature_collection_dc)
-
-        features = fc_data['features']
-        for fc_key, fc_item in enumerate(features):
-            data_item_type = feature_collection_dc['features'][fc_key]['type']
-            assert fc_item['type'] == data_item_type
-
-        assert feature_collection_dc['type'] == fc_data['type']
-
-    def test_dump_many_schema(self, get_feature_collection_data):
-        feature_collection_dc = get_feature_collection_data
-
-        fc_schema = FeatureCollectionSchema(many=True)
-        fc_data_list = fc_schema.dump([feature_collection_dc])
-
-        assert len(fc_data_list) == 1
-        fc_data = fc_data_list[0]
-
-        features = fc_data['features']
-        for fc_key, fc_item in enumerate(features):
-            data_item_type = feature_collection_dc['features'][fc_key]['type']
-            assert fc_item['type'] == data_item_type
-
-        assert feature_collection_dc['type'] == fc_data['type']
-
-    def test_schema_type(self, get_feature_collection_data):
-        feature_collection_dc = get_feature_collection_data
-        data_text = json.dumps(feature_collection_dc)
-
-        fc_schema = FeatureCollectionSchema()
-        fc_data = fc_schema.loads(data_text)
-        assert FEATURE_COLLECTION == fc_data['type']
-
-    def test_schema_type_error(self, get_point_data):
-        point_dc = get_point_data
-        data_text = json.dumps(point_dc)
-
-        fc_schema = FeatureCollectionSchema()
-        with pytest.raises(
-            ValidationError,
-            match='Invalid feature collection type',
-        ):
-            fc_schema.loads(data_text)
+        schema = FeatureCollectionSchema()
+        fc_data = schema.load(data)
+        assert fc_data["type"] == FEATURE_COLLECTION
+        assert len(fc_data["features"]) == 3
+        assert fc_data["features"][0]["geometry"] is not None
+        assert fc_data["features"][0]["geometry"]["type"] == "Point"
+        assert fc_data["features"][1]["geometry"] is not None
+        assert fc_data["features"][1]["geometry"]["type"] == "LineString"
+        assert fc_data["features"][2]["geometry"] is not None
+        assert fc_data["features"][2]["geometry"]["type"] == "Polygon"

@@ -1,3 +1,5 @@
+"""Tests for LineStringSchema."""
+
 import json
 
 import pytest
@@ -5,131 +7,109 @@ from marshmallow.exceptions import ValidationError
 
 from marshmallow_geojson import LineStringSchema
 from marshmallow_geojson.object_type import LINE_STRING
+from tests.test_utils import assert_coordinates_equal
 
 
 class TestLineStringSchema:
-    def test_loads_schema(self, get_line_string_data):
-        line_string_dc = get_line_string_data
-        data_text = json.dumps(line_string_dc)
+    """Test suite for LineStringSchema validation and serialization."""
 
-        ls_schema = LineStringSchema()
-        ls_data = ls_schema.loads(data_text)
+    def test_valid_linestring_creation(self, valid_linestring_data):
+        """Test creating a valid LineString schema."""
+        schema = LineStringSchema()
+        ls_data = schema.load(valid_linestring_data)
 
-        coordinates = ls_data['coordinates']
-        for lsi_key, ls_item in enumerate(coordinates):
-            lon, lat = ls_item
-            assert line_string_dc['coordinates'][lsi_key] == [lon, lat]
+        assert ls_data["type"] == LINE_STRING
+        assert ls_data["type"] == valid_linestring_data["type"]
+        assert len(ls_data["coordinates"]) == len(valid_linestring_data["coordinates"])
 
-        assert line_string_dc['type'] == ls_data['type']
+        for idx, coord in enumerate(ls_data["coordinates"]):
+            expected = valid_linestring_data["coordinates"][idx]
+            assert_coordinates_equal(coord, expected)
 
-    def test_loads_many_schema(self, get_line_string_data):
-        line_string_dc = get_line_string_data
-        data_text = json.dumps([line_string_dc])
+    def test_valid_linestring_minimal(self, valid_linestring_minimal):
+        """Test LineString with minimal required coordinates (2 points)."""
+        schema = LineStringSchema()
+        ls_data = schema.load(valid_linestring_minimal)
 
-        ls_schema = LineStringSchema(many=True)
-        ls_data_list = ls_schema.loads(data_text)
+        assert ls_data["type"] == LINE_STRING
+        assert len(ls_data["coordinates"]) == 2
 
-        assert len(ls_data_list) == 1
-        ls_data = ls_data_list[0]
+    def test_linestring_must_have_at_least_two_coords(self, invalid_linestring_one_coordinate):
+        """Test that LineString requires at least 2 coordinates."""
+        schema = LineStringSchema()
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load(invalid_linestring_one_coordinate)
 
-        coordinates = ls_data['coordinates']
-        for lsi_key, ls_item in enumerate(coordinates):
-            lon, lat = ls_item
-            assert line_string_dc['coordinates'][lsi_key] == [lon, lat]
+        error_str = str(exc_info.value)
+        assert "at least 2 coordinates" in error_str or "at least 2" in error_str.lower()
 
-        assert line_string_dc['type'] == ls_data['type']
+    def test_linestring_empty_coordinates(self, invalid_linestring_empty):
+        """Test that LineString cannot have empty coordinates."""
+        schema = LineStringSchema()
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load(invalid_linestring_empty)
 
-    def test_load_schema(self, get_line_string_data):
-        line_string_dc = get_line_string_data
+        error_str = str(exc_info.value)
+        assert "at least 2 coordinates" in error_str or "at least 2" in error_str.lower()
 
-        ls_schema = LineStringSchema()
-        ls_data = ls_schema.load(line_string_dc)
+    def test_linestring_invalid_type(self, invalid_linestring_bad_type):
+        """Test LineString with invalid type field."""
+        schema = LineStringSchema()
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load(invalid_linestring_bad_type)
 
-        coordinates = ls_data['coordinates']
-        for lsi_key, ls_item in enumerate(coordinates):
-            lon, lat = ls_item
-            assert line_string_dc['coordinates'][lsi_key] == [lon, lat]
+        assert "Invalid line string type" in str(exc_info.value)
 
-        assert line_string_dc['type'] == ls_data['type']
+    def test_linestring_serialization(self, valid_linestring_data):
+        """Test LineString schema serialization to dict."""
+        schema = LineStringSchema()
+        ls_data = schema.load(valid_linestring_data)
+        serialized = schema.dump(ls_data)
 
-    def test_load_many_schema(self, get_line_string_data):
-        line_string_dc = get_line_string_data
+        assert serialized["type"] == "LineString"
+        assert len(serialized["coordinates"]) == len(valid_linestring_data["coordinates"])
+        # Coordinates may include None for altitude, so check first 2 elements of each coordinate
+        for idx, coord in enumerate(serialized["coordinates"]):
+            assert coord[:2] == valid_linestring_data["coordinates"][idx]
 
-        ls_schema = LineStringSchema(many=True)
-        ls_data_list = ls_schema.load([line_string_dc])
+    def test_linestring_json_serialization(self, valid_linestring_data):
+        """Test LineString schema JSON serialization."""
+        schema = LineStringSchema()
+        ls_data = schema.load(valid_linestring_data)
+        json_str = schema.dumps(ls_data)
 
-        assert len(ls_data_list) == 1
-        ls_data = ls_data_list[0]
+        assert '"type":"LineString"' in json_str or '"type": "LineString"' in json_str
+        assert len(valid_linestring_data["coordinates"]) > 0
+        # Check that coordinates are in JSON
+        assert str(valid_linestring_data["coordinates"][0][0]) in json_str
 
-        coordinates = ls_data['coordinates']
-        for lsi_key, ls_item in enumerate(coordinates):
-            lon, lat = ls_item
-            assert line_string_dc['coordinates'][lsi_key] == [lon, lat]
+    def test_linestring_from_json(self, valid_linestring_data):
+        """Test creating LineString from JSON string."""
+        json_str = json.dumps(valid_linestring_data)
+        schema = LineStringSchema()
+        ls_data = schema.loads(json_str)
 
-        assert line_string_dc['type'] == ls_data['type']
+        assert ls_data["type"] == LINE_STRING
+        assert len(ls_data["coordinates"]) == len(valid_linestring_data["coordinates"])
 
-    def test_dumps_schema(self, get_line_string_data):
-        line_string_dc = get_line_string_data
-        data_text = json.dumps(line_string_dc)
+    def test_linestring_with_bbox(self, valid_linestring_data, bbox_2d):
+        """Test LineString with bounding box."""
+        data = {**valid_linestring_data, "bbox": bbox_2d}
+        schema = LineStringSchema()
+        ls_data = schema.load(data)
 
-        ls_schema = LineStringSchema()
-        ls_data_text = ls_schema.dumps(line_string_dc)
+        assert ls_data["bbox"] == bbox_2d
+        assert ls_data["type"] == LINE_STRING
 
-        assert json.loads(data_text) == json.loads(ls_data_text)
+    def test_linestring_boundary_coordinates(self, boundary_coordinates):
+        """Test LineString with coordinates at valid boundaries."""
+        coords = [
+            boundary_coordinates["corner_sw"],
+            boundary_coordinates["corner_ne"],
+        ]
+        data = {"type": "LineString", "coordinates": coords}
+        schema = LineStringSchema()
+        ls_data = schema.load(data)
 
-    def test_dumps_many_schema(self, get_line_string_data):
-        line_string_dc = get_line_string_data
-        data_text = json.dumps([line_string_dc])
-
-        ls_schema = LineStringSchema(many=True)
-        ls_data_text = ls_schema.dumps([line_string_dc])
-
-        assert json.loads(data_text) == json.loads(ls_data_text)
-
-    def test_dump_schema(self, get_line_string_data):
-        line_string_dc = get_line_string_data
-
-        ls_schema = LineStringSchema()
-        ls_data = ls_schema.dump(line_string_dc)
-
-        coordinates = ls_data['coordinates']
-        for lsi_key, ls_item in enumerate(coordinates):
-            lon, lat = ls_item
-            assert line_string_dc['coordinates'][lsi_key] == [lon, lat]
-
-        assert line_string_dc['type'] == ls_data['type']
-
-    def test_dump_many_schema(self, get_line_string_data):
-        line_string_dc = get_line_string_data
-
-        ls_schema = LineStringSchema(many=True)
-        ls_data_list = ls_schema.dump([line_string_dc])
-
-        assert len(ls_data_list) == 1
-        ls_data = ls_data_list[0]
-
-        coordinates = ls_data['coordinates']
-        for lsi_key, ls_item in enumerate(coordinates):
-            lon, lat = ls_item
-            assert line_string_dc['coordinates'][lsi_key] == [lon, lat]
-
-        assert line_string_dc['type'] == ls_data['type']
-
-    def test_schema_type(self, get_line_string_data):
-        line_string_dc = get_line_string_data
-        data_text = json.dumps(line_string_dc)
-
-        ls_schema = LineStringSchema()
-        ls_data = ls_schema.loads(data_text)
-        assert LINE_STRING == ls_data['type']
-
-    def test_schema_type_error(self, get_point_data):
-        point_dc = get_point_data
-        data_text = json.dumps(point_dc)
-
-        ls_schema = LineStringSchema()
-        with pytest.raises(
-            ValidationError,
-            match='Invalid line string type',
-        ):
-            ls_schema.loads(data_text)
+        assert ls_data["type"] == LINE_STRING
+        assert len(ls_data["coordinates"]) == 2

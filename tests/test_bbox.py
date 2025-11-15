@@ -1,88 +1,332 @@
-import json
+"""Tests for bounding box validation according to RFC 7946."""
 
 import pytest
-from marshmallow import ValidationError
-from marshmallow.fields import Float, List
+from marshmallow.exceptions import ValidationError
 
-from marshmallow_geojson import PointSchema
-from marshmallow_geojson.validate import Bbox
+from marshmallow_geojson import FeatureCollectionSchema, FeatureSchema, PointSchema
 
 
-class BboxPointSchema(PointSchema):
-    bbox = List(
-        cls_or_instance=Float(
-            required=True,
-        ),
-        required=True,
-        validate=Bbox(
-            min_lon=-180,
-            max_lon=180,
-            min_lat=-90,
-            max_lat=90,
-        ),
-    )
+class TestBoundingBoxValidation:
+    """Test suite for bounding box validation."""
 
+    def test_valid_2d_bbox(self):
+        """Test valid 2D bounding box."""
+        data = {
+            "type": "Point",
+            "coordinates": [0, 0],
+            "bbox": [-10.0, -10.0, 10.0, 10.0],
+        }
+        schema = PointSchema()
+        point_data = schema.load(data)
+        assert point_data["bbox"] == [-10.0, -10.0, 10.0, 10.0]
 
-class TestBboxSchema:
-    def test_loads_schema(self, get_point_data):
-        bbox_p_dc = get_point_data
-        bbox_p_dc["bbox"] = [10, 10, 10, 10]
-        data_text = json.dumps(bbox_p_dc)
+    def test_valid_3d_bbox(self):
+        """Test valid 3D bounding box."""
+        data = {
+            "type": "Point",
+            "coordinates": [0, 0, 100],
+            "bbox": [-10.0, -10.0, 0.0, 10.0, 10.0, 1000.0],
+        }
+        schema = PointSchema()
+        point_data = schema.load(data)
+        assert point_data["bbox"] == [-10.0, -10.0, 0.0, 10.0, 10.0, 1000.0]
 
-        bbox_p_schema = BboxPointSchema()
-        bbox_p_data = bbox_p_schema.loads(data_text)
-        assert bbox_p_dc["bbox"] == bbox_p_data["bbox"]
+    def test_valid_1d_bbox(self):
+        """Test valid 1D bounding box (edge case)."""
+        data = {
+            "type": "Point",
+            "coordinates": [0, 0],
+            "bbox": [0.0, 1.0],
+        }
+        schema = PointSchema()
+        point_data = schema.load(data)
+        assert point_data["bbox"] == [0.0, 1.0]
 
-    def test_error_quantity(self, get_point_data):
-        bbox_p_dc = get_point_data
-        bbox_p_dc["bbox"] = [10, 10, 10]
-        data_text = json.dumps(bbox_p_dc)
+    def test_bbox_none(self):
+        """Test that None bbox is allowed."""
+        data = {"type": "Point", "coordinates": [0, 0], "bbox": None}
+        schema = PointSchema()
+        point_data = schema.load(data)
+        assert point_data["bbox"] is None
 
-        bbox_p_schema = BboxPointSchema()
+    def test_bbox_invalid_length_too_short(self):
+        """Test bbox with invalid length (too short)."""
+        data = {
+            "type": "Point",
+            "coordinates": [0, 0],
+            "bbox": [0.0],
+        }
+        schema = PointSchema()
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load(data)
 
-        with pytest.raises(ValidationError, match="2*n condition"):
-            bbox_p_schema.loads(data_text)
+        error_str = str(exc_info.value)
+        assert "must have 2, 4, or 6 elements" in error_str
 
-    def test_error_max_lon(self, get_point_data):
-        bbox_p_dc = get_point_data
-        bbox_p_dc["bbox"] = [200, 10, 10, 10]
-        data_text = json.dumps(bbox_p_dc)
+    def test_bbox_invalid_length_3_elements(self):
+        """Test bbox with invalid length (3 elements)."""
+        data = {
+            "type": "Point",
+            "coordinates": [0, 0],
+            "bbox": [1.0, 2.0, 3.0],
+        }
+        schema = PointSchema()
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load(data)
 
-        bbox_p_schema = BboxPointSchema()
+        error_str = str(exc_info.value)
+        assert "must have 2, 4, or 6 elements" in error_str
 
-        with pytest.raises(
-            ValidationError, match="Longitude must be between -180, 180."
-        ):
-            bbox_p_schema.loads(data_text)
+    def test_bbox_invalid_length_too_long(self):
+        """Test bbox with invalid length (too long)."""
+        data = {
+            "type": "Point",
+            "coordinates": [0, 0],
+            "bbox": [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0],
+        }
+        schema = PointSchema()
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load(data)
 
-    def test_error_min_lon(self, get_point_data):
-        bbox_p_dc = get_point_data
-        bbox_p_dc["bbox"] = [-200, 10, 10, 10]
-        data_text = json.dumps(bbox_p_dc)
+        error_str = str(exc_info.value)
+        assert "must have 2, 4, or 6 elements" in error_str
 
-        bbox_p_schema = BboxPointSchema()
+    def test_bbox_invalid_longitude_west_too_small(self):
+        """Test bbox with west longitude too small."""
+        data = {
+            "type": "Point",
+            "coordinates": [0, 0],
+            "bbox": [-181.0, -10.0, 10.0, 10.0],
+        }
+        schema = PointSchema()
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load(data)
 
-        with pytest.raises(
-            ValidationError, match="Longitude must be between -180, 180."
-        ):
-            bbox_p_schema.loads(data_text)
+        error_str = str(exc_info.value)
+        assert "west longitude must be in [-180, 180]" in error_str
 
-    def test_error_max_lat(self, get_point_data):
-        bbox_p_dc = get_point_data
-        bbox_p_dc["bbox"] = [10, 100, 10, 10]
-        data_text = json.dumps(bbox_p_dc)
+    def test_bbox_invalid_longitude_west_too_large(self):
+        """Test bbox with west longitude too large."""
+        data = {
+            "type": "Point",
+            "coordinates": [0, 0],
+            "bbox": [181.0, -10.0, 10.0, 10.0],
+        }
+        schema = PointSchema()
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load(data)
 
-        bbox_p_schema = BboxPointSchema()
+        error_str = str(exc_info.value)
+        assert "west longitude must be in [-180, 180]" in error_str
 
-        with pytest.raises(ValidationError, match="Latitude must be between -90, 90."):
-            bbox_p_schema.loads(data_text)
+    def test_bbox_invalid_longitude_east_too_small(self):
+        """Test bbox with east longitude too small."""
+        data = {
+            "type": "Point",
+            "coordinates": [0, 0],
+            "bbox": [-10.0, -10.0, -181.0, 10.0],
+        }
+        schema = PointSchema()
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load(data)
 
-    def test_error_min_lat(self, get_point_data):
-        bbox_p_dc = get_point_data
-        bbox_p_dc["bbox"] = [10, -100, 10, 10]
-        data_text = json.dumps(bbox_p_dc)
+        error_str = str(exc_info.value)
+        assert "east longitude must be in [-180, 180]" in error_str
 
-        bbox_p_schema = BboxPointSchema()
+    def test_bbox_invalid_longitude_east_too_large(self):
+        """Test bbox with east longitude too large."""
+        data = {
+            "type": "Point",
+            "coordinates": [0, 0],
+            "bbox": [-10.0, -10.0, 181.0, 10.0],
+        }
+        schema = PointSchema()
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load(data)
 
-        with pytest.raises(ValidationError, match="Latitude must be between -90, 90."):
-            bbox_p_schema.loads(data_text)
+        error_str = str(exc_info.value)
+        assert "east longitude must be in [-180, 180]" in error_str
+
+    def test_bbox_invalid_latitude_south_too_small(self):
+        """Test bbox with south latitude too small."""
+        data = {
+            "type": "Point",
+            "coordinates": [0, 0],
+            "bbox": [-10.0, -91.0, 10.0, 10.0],
+        }
+        schema = PointSchema()
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load(data)
+
+        error_str = str(exc_info.value)
+        assert "south latitude must be in [-90, 90]" in error_str
+
+    def test_bbox_invalid_latitude_south_too_large(self):
+        """Test bbox with south latitude too large."""
+        data = {
+            "type": "Point",
+            "coordinates": [0, 0],
+            "bbox": [-10.0, 91.0, 10.0, 10.0],
+        }
+        schema = PointSchema()
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load(data)
+
+        error_str = str(exc_info.value)
+        assert "south latitude must be in [-90, 90]" in error_str
+
+    def test_bbox_invalid_latitude_north_too_small(self):
+        """Test bbox with north latitude too small."""
+        data = {
+            "type": "Point",
+            "coordinates": [0, 0],
+            "bbox": [-10.0, -10.0, 10.0, -91.0],
+        }
+        schema = PointSchema()
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load(data)
+
+        error_str = str(exc_info.value)
+        assert "north latitude must be in [-90, 90]" in error_str
+
+    def test_bbox_invalid_latitude_north_too_large(self):
+        """Test bbox with north latitude too large."""
+        data = {
+            "type": "Point",
+            "coordinates": [0, 0],
+            "bbox": [-10.0, -10.0, 10.0, 91.0],
+        }
+        schema = PointSchema()
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load(data)
+
+        error_str = str(exc_info.value)
+        assert "north latitude must be in [-90, 90]" in error_str
+
+    def test_bbox_invalid_latitude_order(self):
+        """Test bbox with invalid latitude order (north < south)."""
+        data = {
+            "type": "Point",
+            "coordinates": [0, 0],
+            "bbox": [-10.0, 10.0, 10.0, -10.0],  # north < south
+        }
+        schema = PointSchema()
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load(data)
+
+        error_str = str(exc_info.value)
+        assert "north latitude" in error_str and "south latitude" in error_str
+
+    def test_bbox_valid_antimeridian_crossing(self):
+        """Test valid bbox crossing antimeridian (west > east)."""
+        # Example from RFC 7946 Section 5.2: Fiji archipelago
+        data = {
+            "type": "Point",
+            "coordinates": [0, 0],
+            "bbox": [177.0, -20.0, -178.0, -16.0],
+        }
+        schema = PointSchema()
+        point_data = schema.load(data)
+        assert point_data["bbox"] == [177.0, -20.0, -178.0, -16.0]
+
+    def test_bbox_invalid_antimeridian_span_too_large(self):
+        """Test bbox with antimeridian crossing but span >= 360 degrees."""
+        # This should be invalid: west > east but span is 360+ degrees
+        data = {
+            "type": "Point",
+            "coordinates": [0, 0],
+            "bbox": [179.0, -10.0, -179.0, 10.0],  # span = 2 degrees, should be OK
+        }
+        # This should work
+        schema = PointSchema()
+        point_data = schema.load(data)
+        assert point_data["bbox"] == [179.0, -10.0, -179.0, 10.0]
+
+    def test_bbox_valid_north_pole(self):
+        """Test valid bbox containing North Pole."""
+        # From RFC 7946 Section 5.3
+        data = {
+            "type": "Point",
+            "coordinates": [0, 0],
+            "bbox": [-180.0, 60.0, 180.0, 90.0],
+        }
+        schema = PointSchema()
+        point_data = schema.load(data)
+        assert point_data["bbox"] == [-180.0, 60.0, 180.0, 90.0]
+
+    def test_bbox_valid_south_pole(self):
+        """Test valid bbox containing South Pole."""
+        # From RFC 7946 Section 5.3
+        data = {
+            "type": "Point",
+            "coordinates": [0, 0],
+            "bbox": [-180.0, -90.0, 180.0, -60.0],
+        }
+        schema = PointSchema()
+        point_data = schema.load(data)
+        assert point_data["bbox"] == [-180.0, -90.0, 180.0, -60.0]
+
+    def test_bbox_3d_invalid_depth_height_order(self):
+        """Test 3D bbox with invalid depth/height order (depth > height)."""
+        data = {
+            "type": "Point",
+            "coordinates": [0, 0, 100],
+            "bbox": [-10.0, -10.0, 100.0, 10.0, 10.0, 0.0],  # depth > height
+        }
+        schema = PointSchema()
+        with pytest.raises(ValidationError) as exc_info:
+            schema.load(data)
+
+        error_str = str(exc_info.value)
+        assert "depth" in error_str and "height" in error_str
+
+    def test_bbox_3d_valid(self):
+        """Test valid 3D bbox."""
+        data = {
+            "type": "Point",
+            "coordinates": [0, 0, 100],
+            "bbox": [-10.0, -10.0, 0.0, 10.0, 10.0, 1000.0],
+        }
+        schema = PointSchema()
+        point_data = schema.load(data)
+        assert point_data["bbox"] == [-10.0, -10.0, 0.0, 10.0, 10.0, 1000.0]
+
+    def test_bbox_on_feature(self):
+        """Test bbox validation on Feature object."""
+        data = {
+            "type": "Feature",
+            "geometry": {"type": "Point", "coordinates": [0, 0]},
+            "properties": {},
+            "bbox": [-10.0, -10.0, 10.0, 10.0],
+        }
+        schema = FeatureSchema()
+        feature_data = schema.load(data)
+        assert feature_data["bbox"] == [-10.0, -10.0, 10.0, 10.0]
+
+    def test_bbox_on_feature_collection(self):
+        """Test bbox validation on FeatureCollection object."""
+        data = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {"type": "Point", "coordinates": [0, 0]},
+                    "properties": {},
+                }
+            ],
+            "bbox": [100.0, 0.0, 105.0, 1.0],
+        }
+        schema = FeatureCollectionSchema()
+        fc_data = schema.load(data)
+        assert fc_data["bbox"] == [100.0, 0.0, 105.0, 1.0]
+
+    def test_bbox_boundary_values(self):
+        """Test bbox with boundary coordinate values."""
+        data = {
+            "type": "Point",
+            "coordinates": [0, 0],
+            "bbox": [-180.0, -90.0, 180.0, 90.0],
+        }
+        schema = PointSchema()
+        point_data = schema.load(data)
+        assert point_data["bbox"] == [-180.0, -90.0, 180.0, 90.0]

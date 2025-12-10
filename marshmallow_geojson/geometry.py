@@ -49,7 +49,6 @@ class GeometriesSchema(BaseSchema):
         only: types.StrSequenceOrSet | None = None,
         exclude: types.StrSequenceOrSet = (),
         many: bool = False,
-        context: dict | None = None,
         load_only: types.StrSequenceOrSet = (),
         dump_only: types.StrSequenceOrSet = (),
         partial: bool | types.StrSequenceOrSet = False,
@@ -61,7 +60,6 @@ class GeometriesSchema(BaseSchema):
             only: Fields to include during serialization/deserialization.
             exclude: Fields to exclude during serialization/deserialization.
             many: Whether to handle multiple objects (list) or single object.
-            context: Optional context dictionary for custom validation.
             load_only: Fields that are only used during deserialization.
             dump_only: Fields that are only used during serialization.
             partial: Whether to allow partial data. Can be True/False or a
@@ -73,7 +71,6 @@ class GeometriesSchema(BaseSchema):
             only=only,
             exclude=exclude,
             many=many,
-            context=context,
             load_only=load_only,
             dump_only=dump_only,
             partial=partial,
@@ -169,7 +166,6 @@ class GeometriesSchema(BaseSchema):
                     schema(
                         only=self.only,
                         exclude=self.exclude,
-                        context=self.context,
                         load_only=self.load_only,
                         dump_only=self.dump_only,
                         partial=self.partial,
@@ -185,7 +181,6 @@ class GeometriesSchema(BaseSchema):
             result = schema(
                 only=self.only,
                 exclude=self.exclude,
-                context=self.context,
                 load_only=self.load_only,
                 dump_only=self.dump_only,
                 partial=self.partial,
@@ -229,7 +224,6 @@ class GeometriesSchema(BaseSchema):
                     schema(
                         only=self.only,
                         exclude=self.exclude,
-                        context=self.context,
                         load_only=self.load_only,
                         dump_only=self.dump_only,
                         partial=self.partial,
@@ -243,7 +237,6 @@ class GeometriesSchema(BaseSchema):
             data = schema(
                 only=self.only,
                 exclude=self.exclude,
-                context=self.context,
                 load_only=self.load_only,
                 dump_only=self.dump_only,
                 partial=self.partial,

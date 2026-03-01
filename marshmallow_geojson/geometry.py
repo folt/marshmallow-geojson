@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import typing
+from typing import Literal
 
 import marshmallow as ma
 from marshmallow import types
@@ -52,7 +53,7 @@ class GeometriesSchema(BaseSchema):
         load_only: types.StrSequenceOrSet = (),
         dump_only: types.StrSequenceOrSet = (),
         partial: bool | types.StrSequenceOrSet = False,
-        unknown: str | None = None,
+        unknown: Literal["exclude", "include", "raise"] | None = None,
     ):
         """Initialize GeometriesSchema.
 
@@ -135,7 +136,7 @@ class GeometriesSchema(BaseSchema):
         *,
         many: bool | None = None,
         partial: bool | types.StrSequenceOrSet | None = None,
-        unknown: str | None = None,
+        unknown: Literal["exclude", "include", "raise"] | None = None,
     ):
         """Deserialize and validate geometry data.
 

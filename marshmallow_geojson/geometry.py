@@ -54,6 +54,7 @@ class GeometriesSchema(BaseSchema):
         dump_only: types.StrSequenceOrSet = (),
         partial: bool | types.StrSequenceOrSet = False,
         unknown: Literal["exclude", "include", "raise"] | None = None,
+        **kwargs: typing.Any,
     ):
         """Initialize GeometriesSchema.
 
@@ -76,6 +77,7 @@ class GeometriesSchema(BaseSchema):
             dump_only=dump_only,
             partial=partial,
             unknown=unknown,
+            **kwargs,
         )
 
         self._object_type_map: dict[str, type[BaseSchema]] | None = None

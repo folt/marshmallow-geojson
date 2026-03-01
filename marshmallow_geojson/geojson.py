@@ -63,6 +63,7 @@ class GeoJSONSchema(BaseSchema):
         dump_only: types.StrSequenceOrSet = (),
         partial: bool | types.StrSequenceOrSet = False,
         unknown: Literal["exclude", "include", "raise"] | None = None,
+        **kwargs: typing.Any,
     ):
         """Initialize GeoJSONSchema.
 
@@ -85,6 +86,7 @@ class GeoJSONSchema(BaseSchema):
             dump_only=dump_only,
             partial=partial,
             unknown=unknown,
+            **kwargs,
         )
 
         self.object_type_map = {

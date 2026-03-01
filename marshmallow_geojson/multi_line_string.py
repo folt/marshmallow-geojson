@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from marshmallow import pre_load
-from marshmallow.fields import List, Number, Str
+from marshmallow.fields import Float, List, Str
 from marshmallow.validate import OneOf
 
 from ._base import BaseSchema
@@ -41,7 +41,7 @@ class MultiLineStringSchema(BaseSchema):
     coordinates = List(
         List(
             List(
-                Number(),
+                Float(),
                 required=True,
             ),
             required=True,
@@ -59,7 +59,7 @@ class MultiLineStringSchema(BaseSchema):
     )
 
     bbox = List(
-        Number(),
+        Float(),
         required=False,
         allow_none=True,
         validate=Bbox(),

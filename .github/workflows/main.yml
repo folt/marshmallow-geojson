@@ -15,12 +15,24 @@ permissions:
 
 jobs:
   test:
-    name: Test Python ${{ matrix.python-version }}
+    name: Test Python ${{ matrix.python-version }} + marshmallow ${{ matrix.marshmallow-version }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        include:
+          - python-version: "3.10"
+            marshmallow-version: "3.20"
+          - python-version: "3.10"
+            marshmallow-version: "4.2"
+          - python-version: "3.11"
+            marshmallow-version: "3.20"
+          - python-version: "3.11"
+            marshmallow-version: "4.2"
+          - python-version: "3.12"
+            marshmallow-version: "4.2"
+          - python-version: "3.13"
+            marshmallow-version: "4.2"
 
     steps:
       - name: Checkout code
@@ -44,7 +56,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: .venv
-          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ matrix.marshmallow-version }}-${{ hashFiles('**/poetry.lock') }}
 
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
@@ -53,11 +65,15 @@ jobs:
       - name: Install project
         run: poetry install --no-interaction
 
+      - name: Override marshmallow version
+        if: matrix.marshmallow-version != ''
+        run: poetry add "marshmallow==${{ matrix.marshmallow-version }}"
+
       - name: Run tests with coverage
         run: poetry run pytest --cov=marshmallow_geojson --cov-report=xml --cov-report=term-missing
 
       - name: Upload coverage to Codecov
-        if: matrix.python-version == '3.11'
+        if: matrix.python-version == '3.11' && matrix.marshmallow-version == '4.2'
         uses: codecov/codecov-action@v5
         with:
           file: ./coverage.xml
@@ -119,7 +135,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.11", "3.13"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
 
     steps:
       - name: Checkout code

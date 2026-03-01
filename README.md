@@ -24,7 +24,7 @@ A schema-based, Marshmallow library for validating and working with [GeoJSON](ht
 
 ## Installation
 
-marshmallow-geojson is compatible with Python 3.9 and up.
+marshmallow-geojson is compatible with Python 3.10 and up.
 
 The recommended way to install is via [poetry](https://python-poetry.org/):
 
@@ -722,13 +722,13 @@ except ValidationError as e:
 marshmallow-geojson includes comprehensive bounding box validation:
 
 ```python
-from marshmallow.fields import List, Number
+from marshmallow.fields import Float, List
 from marshmallow_geojson import PointSchema
 from marshmallow_geojson.validate import Bbox
 
 class PointWithBboxSchema(PointSchema):
     bbox = List(
-        Number(),
+        Float(),
         required=False,
         allow_none=True,
         validate=Bbox()

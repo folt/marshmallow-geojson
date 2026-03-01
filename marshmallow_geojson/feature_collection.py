@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from marshmallow import pre_load
-from marshmallow.fields import List, Nested, Number, Str
+from marshmallow.fields import Float, List, Nested, Str
 from marshmallow.validate import OneOf
 
 from ._base import BaseSchema
@@ -59,7 +59,7 @@ class FeatureCollectionSchema(BaseSchema):
     )
 
     bbox = List(
-        Number(),
+        Float(),
         required=False,
         allow_none=True,
         validate=Bbox(),

@@ -22,12 +22,12 @@ class PropertiesSchema(BaseSchema):
     Example:
         To create a custom properties schema::
 
-            from marshmallow.fields import Str, Number
+            from marshmallow.fields import Float, Str
             from marshmallow_geojson import PropertiesSchema
 
             class MyPropertiesSchema(PropertiesSchema):
                 name = Str(required=True)
-                population = Number(required=False)
+                population = Float(required=False)
 
     References:
         https://www.rfc-editor.org/rfc/rfc7946.html#section-3.2

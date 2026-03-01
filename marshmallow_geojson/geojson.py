@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import typing
+from typing import Literal
 
 import marshmallow as ma
 from marshmallow import types
@@ -61,7 +62,8 @@ class GeoJSONSchema(BaseSchema):
         load_only: types.StrSequenceOrSet = (),
         dump_only: types.StrSequenceOrSet = (),
         partial: bool | types.StrSequenceOrSet = False,
-        unknown: str | None = None,
+        unknown: Literal["exclude", "include", "raise"] | None = None,
+        **kwargs: typing.Any,
     ):
         """Initialize GeoJSONSchema.
 
@@ -84,6 +86,7 @@ class GeoJSONSchema(BaseSchema):
             dump_only=dump_only,
             partial=partial,
             unknown=unknown,
+            **kwargs,
         )
 
         self.object_type_map = {
@@ -137,7 +140,7 @@ class GeoJSONSchema(BaseSchema):
         *,
         many: bool | None = None,
         partial: bool | types.StrSequenceOrSet | None = None,
-        unknown: str | None = None,
+        unknown: Literal["exclude", "include", "raise"] | None = None,
     ):
         """Deserialize and validate GeoJSON data.
 

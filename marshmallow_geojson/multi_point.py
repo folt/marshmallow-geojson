@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from marshmallow import pre_load
-from marshmallow.fields import List, Number, Str
+from marshmallow.fields import Float, List, Str
 from marshmallow.validate import Length, OneOf
 
 from ._base import BaseSchema
@@ -40,7 +40,7 @@ class MultiPointSchema(BaseSchema):
 
     coordinates = List(
         List(
-            Number(),
+            Float(),
             required=True,
             validate=Length(min=2, max=3, error="Coordinates must have 2 or 3 elements"),
         ),
@@ -56,7 +56,7 @@ class MultiPointSchema(BaseSchema):
     )
 
     bbox = List(
-        Number(),
+        Float(),
         required=False,
         allow_none=True,
         validate=Bbox(),

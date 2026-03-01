@@ -7,18 +7,18 @@ from typing import Any
 
 import marshmallow as ma
 from marshmallow import ValidationError
-from marshmallow.fields import Number
+from marshmallow.fields import Float
 from marshmallow.validate import Range
 
-lon = Number(
+lon = Float(
     required=True, validate=Range(min=-180, max=180, error="Longitude must be between -180, 180")
 )
 
-lat = Number(
+lat = Float(
     required=True, validate=Range(min=-90, max=90, error="Latitude must be between -90, 90")
 )
 
-alt = Number(
+alt = Float(
     required=False,
     allow_none=False,
 )

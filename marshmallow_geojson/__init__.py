@@ -33,6 +33,7 @@ from .object_type import GeoJSONType, GeometryType
 from .point import PointSchema
 from .polygon import PolygonSchema
 from .property import PropertiesSchema
+from .shapely import from_shapely, geojson_to_shapely, shapely_to_geojson, to_shapely
 from .validate import (
     Bbox,
     LinearRing,
@@ -73,6 +74,11 @@ __all__ = (
     "FeatureCollectionSchema",
     "GeometriesSchema",
     "GeoJSONSchema",
+    # shapely
+    "from_shapely",
+    "geojson_to_shapely",
+    "shapely_to_geojson",
+    "to_shapely",
     # validators
     "Bbox",
     "LinearRing",

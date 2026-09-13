@@ -111,5 +111,49 @@ class BaseSchema(ma.Schema):
             result = type_validator(data)
             if isinstance(result, dict):
                 return result
-
         return data
+
+    def to_shapely(self, data: Any) -> Any:
+        """Convert GeoJSON data to a Shapely geometry object.
+
+        Args:
+            data: JSON string or loaded GeoJSON/Feature data.
+
+        Returns:
+            A Shapely geometry object, or None for missing geometry.
+        """
+        from .shapely import geojson_to_shapely
+
+        if isinstance(data, (str, bytes, bytearray)):
+            data = self.loads(data)
+        return geojson_to_shapely(data)
+
+    shape = to_shapely
+    shapely = to_shapely
+
+    def from_shapely(self, geometry: Any) -> Any:
+        """Convert a Shapely geometry object to a GeoJSON dictionary.
+
+        Args:
+            geometry: A Shapely geometry object or GeoJSON dictionary.
+
+        Returns:
+            A GeoJSON dictionary that can be passed to ``load``.
+        """
+        from .shapely import shapely_to_geojson
+
+        return shapely_to_geojson(geometry)
+
+    def to_geojson(self, geometry: Any) -> Any:
+        """Convert a Shapely geometry object to a GeoJSON string.
+
+        Args:
+            geometry: A Shapely geometry object or GeoJSON dictionary.
+
+        Returns:
+            A GeoJSON string that can be passed to ``loads``.
+        """
+        return json.dumps(self.from_shapely(geometry))
+
+    loads_shapely = to_shapely
+    dumps_shapely = to_geojson
